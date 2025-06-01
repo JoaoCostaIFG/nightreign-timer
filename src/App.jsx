@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 // --- NIGHT CIRCLE PHASES CONFIG ---
 // Each night has these four phases in order.
 const NIGHT_CIRCLE_PHASES = [
-  { circle: "Circle One", phase: "Free Farm", seconds: 270 },   // 4.5 min
-  { circle: "Circle One", phase: "Circle Closing", seconds: 180 }, // 3 min
-  { circle: "Circle Two", phase: "Free Farm", seconds: 210 },   // 3.5 min
-  { circle: "Circle Two", phase: "Circle Closing", seconds: 180 }, // 3 min
+  { circle: "Noontide", phase: "Free Farm", seconds: 270 },   // 4.5 min
+  { circle: "Night", phase: "Circle Closing", seconds: 180 }, // 3 min
+  { circle: "Noontide", phase: "Free Farm", seconds: 210 },   // 3.5 min
+  { circle: "Night", phase: "Circle Closing", seconds: 180 }, // 3 min
 ];
 
 const NIGHT_NAMES = ["First Night", "Second Night"];
