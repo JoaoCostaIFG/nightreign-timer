@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // --- NIGHT CIRCLE PHASES CONFIG ---
 // Each night has these four phases in order.
@@ -126,6 +126,33 @@ function useNightreignTimer() {
 }
 
 export default function NightreignTimerApp() {
+  // Always keep screen awake on mount
+  const wakeLockRef = useRef(null);
+
+  useEffect(() => {
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockRef.current = await navigator.wakeLock.request('screen');
+          wakeLockRef.current.addEventListener('release', () => {
+            // Optionally handle release event
+          });
+        }
+      } catch (err) {
+        // console.log("Wake lock error:", err);
+      }
+    }
+    requestWakeLock();
+
+    // Clean up if component unmounts
+    return () => {
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      }
+    };
+  }, []);
+
   const header = (
     <div className="w-full flex justify-center mb-6">
       <img
