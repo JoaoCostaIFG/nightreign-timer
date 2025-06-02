@@ -20,6 +20,15 @@ function formatTime(seconds) {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
+// Add this helper for TTS-friendly time
+function formatTimeForSpeech(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  if (mins > 0 && secs > 0) return `${mins} minute${mins > 1 ? "s" : ""} ${secs} second${secs > 1 ? "s" : ""}`;
+  if (mins > 0) return `${mins} minute${mins > 1 ? "s" : ""}`;
+  return `${secs} second${secs !== 1 ? "s" : ""}`;
+}
+
 function useNightreignTimer() {
   // nightIndex: null (pre-start), 0 (first night), 1 (second night)
   const [nightIndex, setNightIndex] = useState(null);
@@ -298,7 +307,8 @@ export default function NightreignTimerApp() {
         if (displayPhaseTime === cue.value) shouldPlay = true;
       }
       if (shouldPlay && !wasCuePlayed(phaseKey, cueType)) {
-        playCue("timeRemaining", formatTime(displayPhaseTime));
+        // Use TTS-friendly time string
+        playCue("timeRemaining", formatTimeForSpeech(displayPhaseTime));
         markCuePlayed(phaseKey, cueType);
       }
     });
