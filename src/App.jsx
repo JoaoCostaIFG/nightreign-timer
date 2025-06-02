@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import SettingsModal from "./SettingsModal";
+import TimelineCircle from "./TimelineCircle";
 
 // --- NIGHT CIRCLE PHASES CONFIG ---
 // Each night has these four phases in order.
@@ -125,6 +127,85 @@ function useNightreignTimer() {
   };
 }
 
+// --- AUDIO CUE CONFIG ---
+const DEFAULT_AUDIO_SETTINGS = {
+  enabled: false,
+  volume: 1,
+  timeCues: [
+    { type: "percent", value: 50 }, // 50% remaining
+    { type: "seconds", value: 60 }, // 1 minute left
+  ],
+  useAudioFiles: {
+    noontideStart: false,
+    nightStart: false,
+    timeRemaining: false,
+  },
+};
+
+const AUDIO_CUE_TEXT = {
+  noontideStart: "Noontide is here tarnished, Free Farm Starts Now",
+  nightStart: "Night is here tarnished, Circle Closing",
+  timeRemaining: (time) => `Only ${time} remaining tarnished`,
+};
+
+function getStoredAudioSettings() {
+  try {
+    const stored = localStorage.getItem("audioCueSettings");
+    return stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
+  } catch {
+    return DEFAULT_AUDIO_SETTINGS;
+  }
+}
+
+function setStoredAudioSettings(settings) {
+  localStorage.setItem("audioCueSettings", JSON.stringify(settings));
+}
+
+function useAudioCue(settings) {
+  const playedCuesRef = useRef({}); // { phaseKey: { cueType: true } }
+
+  // Helper to play TTS or audio file
+  function playCue(type, timeText = "") {
+    if (!settings.enabled) return;
+    let text = "";
+    if (type === "noontideStart") text = AUDIO_CUE_TEXT.noontideStart;
+    else if (type === "nightStart") text = AUDIO_CUE_TEXT.nightStart;
+    else if (type === "timeRemaining") text = AUDIO_CUE_TEXT.timeRemaining(timeText);
+
+    // Audio file logic stub
+    if (settings.useAudioFiles[type]) {
+      // TODO: Play audio file for this cue
+      // Example: new Audio(`/audio/${type}.mp3`).play();
+      return;
+    }
+
+    // TTS
+    if (window.speechSynthesis) {
+      const utter = new window.SpeechSynthesisUtterance(text);
+      utter.volume = settings.volume;
+      window.speechSynthesis.speak(utter);
+    }
+  }
+
+  // Reset played cues when phase changes
+  function resetPhaseCues(phaseKey) {
+    playedCuesRef.current[phaseKey] = {};
+  }
+
+  // Mark cue as played for this phase
+  function markCuePlayed(phaseKey, cueType) {
+    if (!playedCuesRef.current[phaseKey]) playedCuesRef.current[phaseKey] = {};
+    playedCuesRef.current[phaseKey][cueType] = true;
+  }
+
+  // Check if cue was played for this phase
+  function wasCuePlayed(phaseKey, cueType) {
+    return playedCuesRef.current[phaseKey]?.[cueType];
+  }
+
+  return { playCue, resetPhaseCues, markCuePlayed, wasCuePlayed };
+}
+
 export default function NightreignTimerApp() {
   // Always keep screen awake on mount
   const wakeLockRef = useRef(null);
@@ -175,44 +256,106 @@ export default function NightreignTimerApp() {
     displayPhaseTime,
   } = useNightreignTimer();
 
+  // --- AUDIO CUE STATE ---
+  const [audioSettings, setAudioSettings] = useState(getStoredAudioSettings());
+  useEffect(() => { setStoredAudioSettings(audioSettings); }, [audioSettings]);
+
+  // --- SETTINGS MODAL STATE ---
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // --- AUDIO CUE LOGIC ---
+  const { playCue, resetPhaseCues, markCuePlayed, wasCuePlayed } = useAudioCue(audioSettings);
+
+  // Track phase key for cue uniqueness
+  const phaseKey = `${nightIndex}-${phaseIndex}`;
+
+  // Play phase start cues
+  useEffect(() => {
+    if (nightIndex === null) return;
+    resetPhaseCues(phaseKey);
+
+    if (currentCircleLabel === "Noontide" && currentPhaseLabel === "Free Farm" && !wasCuePlayed(phaseKey, "noontideStart")) {
+      playCue("noontideStart");
+      markCuePlayed(phaseKey, "noontideStart");
+    }
+    if (currentCircleLabel === "Night" && currentPhaseLabel === "Circle Closing" && !wasCuePlayed(phaseKey, "nightStart")) {
+      playCue("nightStart");
+      markCuePlayed(phaseKey, "nightStart");
+    }
+    // eslint-disable-next-line
+  }, [nightIndex, phaseIndex]);
+
+  // Play time remaining cues
+  useEffect(() => {
+    if (nightIndex === null) return;
+    audioSettings.timeCues.forEach((cue) => {
+      let shouldPlay = false;
+      let cueType = `timeRemaining-${cue.type}-${cue.value}`;
+      if (cue.type === "percent") {
+        const total = NIGHT_CIRCLE_PHASES[phaseIndex]?.seconds || 1;
+        if (displayPhaseTime === Math.floor((cue.value / 100) * total)) shouldPlay = true;
+      } else if (cue.type === "seconds") {
+        if (displayPhaseTime === cue.value) shouldPlay = true;
+      }
+      if (shouldPlay && !wasCuePlayed(phaseKey, cueType)) {
+        playCue("timeRemaining", formatTime(displayPhaseTime));
+        markCuePlayed(phaseKey, cueType);
+      }
+    });
+    // eslint-disable-next-line
+  }, [displayPhaseTime, nightIndex, phaseIndex, audioSettings.timeCues]);
+
   return (
-  <div className="min-h-screen w-screen bg-[#151136] flex flex-col items-center p-4 overflow-x-hidden">
-    {header}
-    <div className="w-full max-w-4xl flex items-center justify-center">
-      <div className="w-full bg-white shadow-lg rounded-lg border border-gray-200 p-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            {/* Moon Image Placeholder */}
+    <div className="min-h-screen w-screen bg-[#151136] flex flex-col items-center p-4 overflow-x-hidden">
+      {header}
+      <div className="w-full max-w-4xl flex items-center justify-center">
+        <div className="w-full bg-white shadow-lg rounded-lg border border-gray-200 p-8 relative">
+          {/* Gear Icon */}
+          <button
+            className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
+            aria-label="Settings"
+            onClick={() => setSettingsOpen(true)}
+          >
+            {/* Standard cogwheel SVG from Heroicons */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.25 2.25c.966 0 1.75.784 1.75 1.75v.5a7.001 7.001 0 0 1 2.25.938l.354-.354a1.75 1.75 0 1 1 2.475 2.475l-.354.354A7.001 7.001 0 0 1 19.5 11h.5a1.75 1.75 0 1 1 0 3.5h-.5a7.001 7.001 0 0 1-.938 2.25l.354.354a1.75 1.75 0 1 1-2.475 2.475l-.354-.354A7.001 7.001 0 0 1 12.75 19.5v.5a1.75 1.75 0 1 1-3.5 0v-.5a7.001 7.001 0 0 1-2.25-.938l-.354.354a1.75 1.75 0 1 1-2.475-2.475l.354-.354A7.001 7.001 0 0 1 4.5 13H4a1.75 1.75 0 1 1 0-3.5h.5a7.001 7.001 0 0 1 .938-2.25l-.354-.354a1.75 1.75 0 1 1 2.475-2.475l.354.354A7.001 7.001 0 0 1 11.25 4.5v-.5c0-.966.784-1.75 1.75-1.75zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+            </svg>
+          </button>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-center md:justify-center gap-0">
+            {/* Night label above timeline circle */}
             <div className="flex flex-col items-center justify-center">
-              <img
-                src="/moon.png"
-                alt="Dark Moon"
-                className="w-64 h-64 object-contain"
-              />
-            </div>
-            <div className="flex flex-col items-center gap-6">
-              <div className="text-center">
-                {currentNightLabel && (
-                  <p className="text-xl font-medium text-black mt-2">
-                    {currentNightLabel}
-                  </p>
-                )}
-                <h2 className="text-l font-semibold text-black mb-1">
-                  Total Night Timer
-                </h2>
-                <p className="text-3xl font-mono text-black">
-                  {formatTime(displayNightTime)}
+              {currentNightLabel && (
+                <p className="text-xl font-medium text-black mb-2">
+                  {currentNightLabel}
                 </p>
-              </div>
-              {(currentCircleLabel && currentPhaseLabel) && (
+              )}
+              {/* TimelineCircle and timers in the same column */}
+              <TimelineCircle
+                phases={NIGHT_CIRCLE_PHASES}
+                phaseIndex={phaseIndex}
+                phaseTime={displayPhaseTime}
+                phaseTotal={NIGHT_CIRCLE_PHASES[phaseIndex]?.seconds || 1}
+              />
+              <div className="flex flex-col items-center gap-3 mt-4">
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-black mb-1">
-                    {currentCircleLabel} – {currentPhaseLabel}
-                  </h3>
+                  <h2 className="text-l font-semibold text-black mb-1">
+                    Total Night Timer
+                  </h2>
                   <p className="text-3xl font-mono text-black">
-                    {formatTime(displayPhaseTime)}
+                    {formatTime(displayNightTime)}
                   </p>
                 </div>
-              )}
+                {(currentCircleLabel && currentPhaseLabel) && (
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-black mb-1">
+                      {currentCircleLabel} – {currentPhaseLabel}
+                    </h3>
+                    <p className="text-3xl font-mono text-black">
+                      {formatTime(displayPhaseTime)}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="mt-8 flex justify-center gap-4">
@@ -237,6 +380,13 @@ export default function NightreignTimerApp() {
           </div>
         </div>
       </div>
+      {/* Settings Modal */}
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        settings={audioSettings}
+        setSettings={setAudioSettings}
+      />
     </div>
   );
 }
