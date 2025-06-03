@@ -29,6 +29,85 @@ function formatTimeForSpeech(seconds) {
   return `${secs} second${secs !== 1 ? "s" : ""}`;
 }
 
+// --- AUDIO CUE CONFIG ---
+const DEFAULT_AUDIO_SETTINGS = {
+  enabled: false,
+  volume: 1,
+  timeCues: [
+    { type: "percent", value: 50 }, // 50% remaining
+    { type: "seconds", value: 60 }, // 1 minute left
+  ],
+  useAudioFiles: {
+    noontideStart: false,
+    nightStart: false,
+    timeRemaining: false,
+  },
+};
+
+const AUDIO_CUE_TEXT = {
+  noontideStart: "Noontide is here tarnished, Free Farm Starts Now",
+  nightStart: "Night is here tarnished, Circle Closing",
+  timeRemaining: (time) => `Only ${time} remaining tarnished`,
+};
+
+function getStoredAudioSettings() {
+  try {
+    const stored = localStorage.getItem("audioCueSettings");
+    return stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
+  } catch {
+    return DEFAULT_AUDIO_SETTINGS;
+  }
+}
+
+function setStoredAudioSettings(settings) {
+  localStorage.setItem("audioCueSettings", JSON.stringify(settings));
+}
+
+function useAudioCueManager(settings) {
+  const playedCuesRef = useRef({}); // { phaseKey: { cueType: true } }
+
+  // Helper to play TTS or audio file
+  function playCue(type, timeText = "") {
+    if (!settings.enabled) return;
+    let text = "";
+    if (type === "noontideStart") text = AUDIO_CUE_TEXT.noontideStart;
+    else if (type === "nightStart") text = AUDIO_CUE_TEXT.nightStart;
+    else if (type === "timeRemaining") text = AUDIO_CUE_TEXT.timeRemaining(timeText);
+
+    // Audio file logic stub
+    if (settings.useAudioFiles[type]) {
+      // TODO: Play audio file for this cue
+      // Example: new Audio(`/audio/${type}.mp3`).play();
+      return;
+    }
+
+    // TTS
+    if (window.speechSynthesis) {
+      const utter = new window.SpeechSynthesisUtterance(text);
+      utter.volume = settings.volume;
+      window.speechSynthesis.speak(utter);
+    }
+  }
+
+  // Reset played cues when phase changes
+  function resetPhaseCues(phaseKey) {
+    playedCuesRef.current[phaseKey] = {};
+  }
+
+  // Mark cue as played for this phase
+  function markCuePlayed(phaseKey, cueType) {
+    if (!playedCuesRef.current[phaseKey]) playedCuesRef.current[phaseKey] = {};
+    playedCuesRef.current[phaseKey][cueType] = true;
+  }
+
+  // Check if cue was played for this phase
+  function wasCuePlayed(phaseKey, cueType) {
+    return playedCuesRef.current[phaseKey]?.[cueType];
+  }
+
+  return { playCue, resetPhaseCues, markCuePlayed, wasCuePlayed };
+}
+
 function useNightreignTimer() {
   // nightIndex: null (pre-start), 0 (first night), 1 (second night)
   const [nightIndex, setNightIndex] = useState(null);
@@ -45,6 +124,8 @@ function useNightreignTimer() {
     }
   }, [nightIndex, phaseIndex]);
 
+  const audioCueManager = useAudioCueManager(getStoredAudioSettings());
+
   // Main timer logic
   useEffect(() => {
     let timer = null;
@@ -55,6 +136,7 @@ function useNightreignTimer() {
             // End of phase: go to next phase
             if (phaseIndex < NIGHT_CIRCLE_PHASES.length - 1) {
               setPhaseIndex(phaseIndex + 1);
+              audioCueManager.resetPhaseCues(`${nightIndex}-${phaseIndex + 1}`);
               return NIGHT_CIRCLE_PHASES[phaseIndex + 1].seconds;
             } else {
               // End of all phases in this night
@@ -62,13 +144,39 @@ function useNightreignTimer() {
               return 0;
             }
           }
+
+          // Check for audio cues
+          const phaseKey = `${nightIndex}-${phaseIndex}`;
+          const remainingPercent = (prev / NIGHT_CIRCLE_PHASES[phaseIndex].seconds) * 100;
+          const timeForSpeech = formatTimeForSpeech(prev);
+
+          // Play noontideStart or nightStart cue at the beginning of the phase
+          if (prev === NIGHT_CIRCLE_PHASES[phaseIndex].seconds) {
+            const cueType = NIGHT_CIRCLE_PHASES[phaseIndex].circle === "Noontide" ? "noontideStart" : "nightStart";
+            if (!audioCueManager.wasCuePlayed(phaseKey, cueType)) {
+              audioCueManager.playCue(cueType);
+              audioCueManager.markCuePlayed(phaseKey, cueType);
+            }
+          }
+
+          getStoredAudioSettings().timeCues.forEach((cue) => {
+            const cueKey = `${cue.type}-${cue.value}`;
+            if (
+              (cue.type === "percent" && remainingPercent <= cue.value && !audioCueManager.wasCuePlayed(phaseKey, cueKey)) ||
+              (cue.type === "seconds" && prev <= cue.value && !audioCueManager.wasCuePlayed(phaseKey, cueKey))
+            ) {
+              audioCueManager.playCue("timeRemaining", timeForSpeech);
+              audioCueManager.markCuePlayed(phaseKey, cueKey);
+            }
+          });
+
           return prev - 1;
         });
         setTotalNightTime((prev) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
     }
     return () => timer && clearInterval(timer);
-  }, [nightIndex, isPaused, phaseIndex]);
+  }, [nightIndex, isPaused, phaseIndex, audioCueManager]);
 
   const begin = () => {
     if (nightIndex === null) {
@@ -134,85 +242,6 @@ function useNightreignTimer() {
     currentPhaseLabel,
     displayPhaseTime,
   };
-}
-
-// --- AUDIO CUE CONFIG ---
-const DEFAULT_AUDIO_SETTINGS = {
-  enabled: false,
-  volume: 1,
-  timeCues: [
-    { type: "percent", value: 50 }, // 50% remaining
-    { type: "seconds", value: 60 }, // 1 minute left
-  ],
-  useAudioFiles: {
-    noontideStart: false,
-    nightStart: false,
-    timeRemaining: false,
-  },
-};
-
-const AUDIO_CUE_TEXT = {
-  noontideStart: "Noontide is here tarnished, Free Farm Starts Now",
-  nightStart: "Night is here tarnished, Circle Closing",
-  timeRemaining: (time) => `Only ${time} remaining tarnished`,
-};
-
-function getStoredAudioSettings() {
-  try {
-    const stored = localStorage.getItem("audioCueSettings");
-    return stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
-  } catch {
-    return DEFAULT_AUDIO_SETTINGS;
-  }
-}
-
-function setStoredAudioSettings(settings) {
-  localStorage.setItem("audioCueSettings", JSON.stringify(settings));
-}
-
-function useAudioCue(settings) {
-  const playedCuesRef = useRef({}); // { phaseKey: { cueType: true } }
-
-  // Helper to play TTS or audio file
-  function playCue(type, timeText = "") {
-    if (!settings.enabled) return;
-    let text = "";
-    if (type === "noontideStart") text = AUDIO_CUE_TEXT.noontideStart;
-    else if (type === "nightStart") text = AUDIO_CUE_TEXT.nightStart;
-    else if (type === "timeRemaining") text = AUDIO_CUE_TEXT.timeRemaining(timeText);
-
-    // Audio file logic stub
-    if (settings.useAudioFiles[type]) {
-      // TODO: Play audio file for this cue
-      // Example: new Audio(`/audio/${type}.mp3`).play();
-      return;
-    }
-
-    // TTS
-    if (window.speechSynthesis) {
-      const utter = new window.SpeechSynthesisUtterance(text);
-      utter.volume = settings.volume;
-      window.speechSynthesis.speak(utter);
-    }
-  }
-
-  // Reset played cues when phase changes
-  function resetPhaseCues(phaseKey) {
-    playedCuesRef.current[phaseKey] = {};
-  }
-
-  // Mark cue as played for this phase
-  function markCuePlayed(phaseKey, cueType) {
-    if (!playedCuesRef.current[phaseKey]) playedCuesRef.current[phaseKey] = {};
-    playedCuesRef.current[phaseKey][cueType] = true;
-  }
-
-  // Check if cue was played for this phase
-  function wasCuePlayed(phaseKey, cueType) {
-    return playedCuesRef.current[phaseKey]?.[cueType];
-  }
-
-  return { playCue, resetPhaseCues, markCuePlayed, wasCuePlayed };
 }
 
 // --- BOSS DATA (for selection) ---
@@ -368,8 +397,6 @@ export default function NightreignTimerApp() {
       displayPhaseTime,
     } = useNightreignTimer();
 
-    // ...existing audio cue logic...
-
     // Use settingsOpen and setSettingsOpen from props
     const { settingsOpen, setSettingsOpen } = props;
 
@@ -510,6 +537,39 @@ export default function NightreignTimerApp() {
           />
         )}
       </div>
+      {/* Footer */}
+      <footer className="w-full flex justify-center items-center gap-6 mt-8 p-4 bg-[#0f0d29]">
+        <a
+          href="https://discord.gg/3qVv7CGeJF"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Join our Discord"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-8 h-8 hover:scale-110 transition-transform text-white"
+          >
+            <path d="M20.317 4.369a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.462 0 12.505 12.505 0 0 0-.617-1.249.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C2.533 9.042 1.8 13.566 2.092 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.038.077.077 0 0 0 .084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.105 13.184 13.184 0 0 1-1.872-.9.077.077 0 0 1-.008-.128c.126-.094.252-.192.373-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.073.073 0 0 1 .078.009c.121.099.247.197.373.291a.077.077 0 0 1-.006.128 12.509 12.509 0 0 1-1.873.899.076.076 0 0 0-.04.106c.36.699.772 1.364 1.226 1.993a.076.076 0 0 0 .084.028 19.876 19.876 0 0 0 6.002-3.038.076.076 0 0 0 .031-.056c.334-5.068-.559-9.544-2.349-13.661a.062.062 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.213 0 2.176 1.096 2.157 2.419 0 1.334-.955 2.419-2.157 2.419zm7.96 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.213 0 2.176 1.096 2.157 2.419 0 1.334-.944 2.419-2.157 2.419z" />
+          </svg>
+        </a>
+        <a
+          href="https://github.com/bnelz/nightreign-timer"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View on GitHub"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-8 h-8 hover:scale-110 transition-transform text-white"
+          >
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.983 1.029-2.682-.103-.253-.446-1.27.098-2.645 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.91-1.296 2.75-1.026 2.75-1.026.544 1.375.202 2.392.1 2.645.64.7 1.028 1.591 1.028 2.682 0 3.842-2.337 4.687-4.565 4.936.359.309.678.92.678 1.852 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.003 10.003 0 0 0 22 12c0-5.523-4.477-10-10-10z" />
+          </svg>
+        </a>
+      </footer>
     </div>
   );
 }
