@@ -356,8 +356,6 @@ export default function NightreignTimerApp() {
   // --- Timer Card Layout (with boss card) ---
   function TimerCard(props) {
     // ...existing timer state and logic...
-    // (copy all timer logic from previous export default here)
-    // For brevity, I'll use the previous destructuring:
     const {
       nightIndex,
       phaseIndex,
@@ -375,9 +373,9 @@ export default function NightreignTimerApp() {
     // Use settingsOpen and setSettingsOpen from props
     const { settingsOpen, setSettingsOpen } = props;
 
-    // --- After timer ends, show "New Expedition" button instead of Begin/Reset ---
+    // --- After timer ends, show "New Expedition" button only after night 2 is done ---
     const timerDone =
-      nightIndex !== null &&
+      nightIndex === 1 &&
       phaseIndex >= NIGHT_CIRCLE_PHASES.length - 1 &&
       displayPhaseTime <= 0;
 
