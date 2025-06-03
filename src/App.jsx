@@ -217,14 +217,14 @@ function useAudioCue(settings) {
 
 // --- BOSS DATA (for selection) ---
 const BOSS_LIST = [
-  { expedition_id: "Tricephalos", weakness: "holy", name: "Gladius, Beast of Night", img: "/gladius-big.png" },
-  { expedition_id: "Gaping Jaw", weakness: "poison", name: "Adel, Baron of Night", img: "/adel-big.png" },
-  { expedition_id: "Fissure in the Fog", weakness: "fire", name: "Caligo, Miasma of Night", img: "/caligo-big.png" },
-  { expedition_id: "Augur", weakness: "lightning", name: "Maris, Fathom of Night", img: "/maris-big.png" },
-  { expedition_id: "Sentient Pest", weakness: "fire", name: "Gnoster, Wisdom of Night", img: "/gnoster-big.png" },
-  { expedition_id: "Equilibrious Beast", weakness: "frenzy", name: "Libra, Creature of Night", img: "/libra-big.png" },
-  { expedition_id: "Darkdrift Knight", weakness: "lightning", name: "Fulghor, Champion of Nightglow", img: "/fulghor-big.png" },
-  { expedition_id: "Night Aspect", weakness: "holy", name: "Heolstor the Nightlord", img: "/heolstor-big.png" },
+  { expedition_id: "Tricephalos", weakness: "holy", name: "Gladius, Beast of Night", img: "/gladius-big.png", icon: "/gladius-small.png" },
+  { expedition_id: "Gaping Jaw", weakness: "poison", name: "Adel, Baron of Night", img: "/adel-big.png" , icon: "/adel-small.png" },
+  { expedition_id: "Fissure in the Fog", weakness: "fire", name: "Caligo, Miasma of Night", img: "/caligo-big.png", icon: "/caligo-small.png"  },
+  { expedition_id: "Augur", weakness: "lightning", name: "Maris, Fathom of Night", img: "/maris-big.png", icon: "/maris-small.png"  },
+  { expedition_id: "Sentient Pest", weakness: "fire", name: "Gnoster, Wisdom of Night", img: "/gnoster-big.png", icon: "/gnoster-small.png"  },
+  { expedition_id: "Equilibrious Beast", weakness: "frenzy", name: "Libra, Creature of Night", img: "/libra-big.png", icon: "/libra-small.png"  },
+  { expedition_id: "Darkdrift Knight", weakness: "lightning", name: "Fulghor, Champion of Nightglow", img: "/fulghor-big.png", icon: "/fulghor-small.png"  },
+  { expedition_id: "Night Aspect", weakness: "holy", name: "Heolstor the Nightlord", img: "/heolstor-big.png", icon: "/heolstor-small.png"  },
 ];
 
 // --- CARD ANIMATION HELPERS (simple CSS classes) ---
@@ -318,7 +318,7 @@ export default function NightreignTimerApp() {
   function BossCard({ boss }) {
     if (!boss) {
       return (
-        <div className="flex flex-col items-center justify-center w-48 min-w-[12rem] max-w-[14rem] bg-gray-50 rounded-lg shadow p-4 mr-6">
+        <div className="flex flex-col items-center justify-center w-48 min-w-[12rem] max-w-[14rem] bg-gray-50 rounded-lg shadow p-4 mr-6 md:mr-6 mb-4 md:mb-0">
           <span className="text-gray-400 text-2xl mb-2">?</span>
           <span className="text-gray-500 font-medium">No Boss Tracked</span>
         </div>
@@ -329,11 +329,11 @@ export default function NightreignTimerApp() {
       ? `/` + boss.weakness.toLowerCase().replace(/\s+/g, "-") + ".png"
       : null;
     return (
-      <div className="flex flex-col items-center justify-center mr-10">
+      <div className="flex flex-col items-center justify-center mb-4 md:mb-0 md:mr-10 w-full md:w-auto">
         <img
-          src={boss.img}
+          src={boss.icon}
           alt={boss.name}
-          className="w-[20rem] h-[20rem] object-contain rounded-2xl shadow-2xl bg-black mb-4"
+          className="w-[12rem] h-[12rem] md:w-[20rem] md:h-[20rem] object-contain rounded-2xl shadow-2xl bg-black mb-4"
           style={{ display: "block" }}
         />
         <span className="text-2xl font-bold text-black text-center mb-2">{boss.name}</span>
@@ -389,12 +389,12 @@ export default function NightreignTimerApp() {
     }
 
     return (
-      <div className={`w-full max-w-4xl flex items-center justify-center ${CARD_ANIMATION_CLASS}`}>
-        <div className="w-full bg-white shadow-lg rounded-lg border border-gray-200 p-8 relative flex flex-row items-start">
-          {/* Boss Card (left) */}
+      <div className={`w-full max-w-4xl flex flex-col md:flex-row items-center md:items-start justify-center ${CARD_ANIMATION_CLASS}`}>
+        <div className="w-full bg-white shadow-lg rounded-lg border border-gray-200 p-8 relative flex flex-col md:flex-row items-center md:items-start">
+          {/* Boss Card (left/top on mobile) */}
           <BossCard boss={selectedBoss} />
-          {/* Timer UI (right) */}
-          <div className="flex-1 flex flex-col items-center">
+          {/* Timer UI (right/bottom on mobile) */}
+          <div className="flex-1 flex flex-col items-center w-full">
             {/* Gear Icon */}
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
@@ -406,9 +406,9 @@ export default function NightreignTimerApp() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.25 2.25c.966 0 1.75.784 1.75 1.75v.5a7.001 7.001 0 0 1 2.25.938l.354-.354a1.75 1.75 0 1 1 2.475 2.475l-.354.354A7.001 7.001 0 0 1 19.5 11h.5a1.75 1.75 0 1 1 0 3.5h-.5a7.001 7.001 0 0 1-.938 2.25l.354.354a1.75 1.75 0 1 1-2.475 2.475l-.354-.354A7.001 7.001 0 0 1 12.75 19.5v.5a1.75 1.75 0 1 1-3.5 0v-.5a7.001 7.001 0 0 1-2.25-.938l-.354.354a1.75 1.75 0 1 1-2.475-2.475l.354-.354A7.001 7.001 0 0 1 4.5 13H4a1.75 1.75 0 1 1 0-3.5h.5a7.001 7.001 0 0 1 .938-2.25l-.354-.354a1.75 1.75 0 1 1 2.475-2.475l.354.354A7.001 7.001 0 0 1 11.25 4.5v-.5c0-.966.784-1.75 1.75-1.75zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
               </svg>
             </button>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-center md:justify-center gap-0">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-center md:justify-center gap-0 w-full">
               {/* Night label above timeline circle */}
-              <div className="flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center w-full">
                 {currentNightLabel && (
                   <p className="text-xl font-medium text-black mb-2">
                     {currentNightLabel}
