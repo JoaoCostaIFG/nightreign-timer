@@ -33,7 +33,7 @@ function formatTimeForSpeech(seconds) {
 const DEFAULT_AUDIO_SETTINGS = {
   mode: "default", // "default" or "custom"
   voice: "Ranni", // Only used in default mode
-  enabled: false,
+  enabled: true,
   volume: 1,
   timeCues: [
     { type: "percent", value: 50 }, // 50% remaining
@@ -47,9 +47,9 @@ const DEFAULT_AUDIO_SETTINGS = {
 };
 
 const AUDIO_CUE_TEXT = {
-  noontideStart: "Noontide is here tarnished, Free Farm Starts Now",
-  nightStart: "Night is here tarnished, Circle Closing",
-  timeRemaining: (time) => `Only ${time} remaining tarnished`,
+  noontideStart: "Noontide is here nightfarer, Free Farm Starts Now",
+  nightStart: "Night is here nightfarer, Circle Closing",
+  timeRemaining: (time) => `Only ${time} remaining nightfarer`,
 };
 
 const DEFAULT_CUE_INTERVALS = [
@@ -205,9 +205,8 @@ function useNightreignTimer() {
                   audioCueManager.markCuePlayed(phaseKey, cueType);
                 }
               }
-              // 3/2/1 min remaining cues
+              // 2/1 min remaining cues
               [
-                { value: 180, cue: "3min" },
                 { value: 120, cue: "2min" },
                 { value: 60, cue: "1min" },
               ].forEach(({ value, cue }) => {
