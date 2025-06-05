@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+const DEFAULT_VOICES = ["Ranni", "Miquella", "Malenia"];
+
 export default function SettingsModal({ open, onClose, settings, setSettings }) {
   const [localSettings, setLocalSettings] = useState(settings);
 
@@ -46,6 +48,37 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
         </button>
         <h2 className="text-xl font-semibold mb-4">Settings</h2>
         <div className="space-y-4">
+          {/* --- Audio Cue Mode Selection --- */}
+          <div>
+            <label className="block mb-1 font-medium">Audio Cue Mode</label>
+            <select
+              value={localSettings.mode}
+              onChange={e =>
+                setLocalSettings({ ...localSettings, mode: e.target.value })
+              }
+              className="border rounded px-2 py-1 w-full"
+            >
+              <option value="default">Default (Game Voices, Fixed Cues)</option>
+              <option value="custom">Custom (TTS, User Cues)</option>
+            </select>
+          </div>
+          {/* --- Voice Selection (only in default mode) --- */}
+          {localSettings.mode === "default" && (
+            <div>
+              <label className="block mb-1 font-medium">Voice</label>
+              <select
+                value={localSettings.voice}
+                onChange={e =>
+                  setLocalSettings({ ...localSettings, voice: e.target.value })
+                }
+                className="border rounded px-2 py-1 w-full"
+              >
+                {DEFAULT_VOICES.map(v => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="flex items-center gap-2">
               <input
@@ -73,99 +106,95 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
             />
             <div className="text-xs text-gray-500">{Math.round(localSettings.volume * 100)}%</div>
           </div>
-          <div>
-            <label className="block mb-1 font-medium">Time Remaining Cues</label>
-            <div className="space-y-2">
-              {localSettings.timeCues.map((cue, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <select
-                    value={cue.type}
-                    onChange={e => handleTimeCueChange(idx, "type", e.target.value)}
-                    className="border rounded px-1 py-0.5"
-                  >
-                    <option value="percent">Percent</option>
-                    <option value="seconds">Seconds</option>
-                  </select>
-                  <input
-                    type="number"
-                    min={cue.type === "percent" ? 1 : 1}
-                    max={cue.type === "percent" ? 99 : 600}
-                    value={cue.value}
-                    onChange={e => handleTimeCueChange(idx, "value", parseInt(e.target.value, 10))}
-                    className="border rounded px-1 py-0.5 w-16"
-                  />
+          {/* --- Custom Mode: Time Cues and Cue Type Toggles --- */}
+          {localSettings.mode === "custom" && (
+            <>
+              <div>
+                <label className="block mb-1 font-medium">Time Remaining Cues</label>
+                <div className="space-y-2">
+                  {localSettings.timeCues.map((cue, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <select
+                        value={cue.type}
+                        onChange={e => handleTimeCueChange(idx, "type", e.target.value)}
+                        className="border rounded px-1 py-0.5"
+                      >
+                        <option value="percent">Percent</option>
+                        <option value="seconds">Seconds</option>
+                      </select>
+                      <input
+                        type="number"
+                        min={cue.type === "percent" ? 1 : 1}
+                        max={cue.type === "percent" ? 99 : 600}
+                        value={cue.value}
+                        onChange={e => handleTimeCueChange(idx, "value", parseInt(e.target.value, 10))}
+                        className="border rounded px-1 py-0.5 w-16"
+                      />
+                      <button
+                        className="text-red-500 hover:underline"
+                        onClick={() => handleRemoveTimeCue(idx)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
                   <button
-                    className="text-red-500 hover:underline"
-                    onClick={() => handleRemoveTimeCue(idx)}
+                    className="text-blue-600 hover:underline text-sm"
+                    onClick={handleAddTimeCue}
                   >
-                    Remove
+                    Add Cue
                   </button>
                 </div>
-              ))}
-              <button
-                className="text-blue-600 hover:underline text-sm"
-                onClick={handleAddTimeCue}
-              >
-                Add Cue
-              </button>
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Cue Type</label>
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={localSettings.useAudioFiles.noontideStart}
+                      onChange={e =>
+                        setLocalSettings({
+                          ...localSettings,
+                          useAudioFiles: {
+                            ...localSettings.useAudioFiles,
+                            noontideStart: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    Enable Noontide Start Cue
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={localSettings.useAudioFiles.nightStart}
+                      onChange={e =>
+                        setLocalSettings({
+                          ...localSettings,
+                          useAudioFiles: {
+                            ...localSettings.useAudioFiles,
+                            nightStart: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    Enable Night Start Cue
+                  </label>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  (Cues use browser TTS in custom mode)
+                </div>
+              </div>
+            </>
+          )}
+          {/* --- Default Mode: Info --- */}
+          {localSettings.mode === "default" && (
+            <div className="text-xs text-gray-500">
+              Cues will play at: Noontide Start, Night Start, 3min, 2min, 1min remaining.<br />
+              Uses selected voice audio files.
             </div>
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Cue Type</label>
-            <div className="space-y-1">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={localSettings.useAudioFiles.noontideStart}
-                  onChange={e =>
-                    setLocalSettings({
-                      ...localSettings,
-                      useAudioFiles: {
-                        ...localSettings.useAudioFiles,
-                        noontideStart: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                Use Audio File for Noontide Start
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={localSettings.useAudioFiles.nightStart}
-                  onChange={e =>
-                    setLocalSettings({
-                      ...localSettings,
-                      useAudioFiles: {
-                        ...localSettings.useAudioFiles,
-                        nightStart: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                Use Audio File for Night Start
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={localSettings.useAudioFiles.timeRemaining}
-                  onChange={e =>
-                    setLocalSettings({
-                      ...localSettings,
-                      useAudioFiles: {
-                        ...localSettings.useAudioFiles,
-                        timeRemaining: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                Use Audio File for Time Remaining
-              </label>
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              (Audio file support is stubbed; TTS will be used by default)
-            </div>
-          </div>
+          )}
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button

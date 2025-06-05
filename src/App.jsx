@@ -31,29 +31,59 @@ function formatTimeForSpeech(seconds) {
 
 // --- AUDIO CUE CONFIG ---
 const DEFAULT_AUDIO_SETTINGS = {
-  enabled: false,
+  mode: "default", // "default" or "custom"
+  voice: "Ranni", // Only used in default mode
+  enabled: true,
   volume: 1,
   timeCues: [
     { type: "percent", value: 50 }, // 50% remaining
     { type: "seconds", value: 60 }, // 1 minute left
   ],
   useAudioFiles: {
-    noontideStart: false,
-    nightStart: false,
+    noontideStart: true,
+    nightStart: true,
     timeRemaining: false,
   },
 };
 
 const AUDIO_CUE_TEXT = {
-  noontideStart: "Noontide is here tarnished, Free Farm Starts Now",
-  nightStart: "Night is here tarnished, Circle Closing",
-  timeRemaining: (time) => `Only ${time} remaining tarnished`,
+  noontideStart: "Noontide is here nightfarer, Free Farm Starts Now",
+  nightStart: "Night is here nightfarer, Circle Closing",
+  timeRemaining: (time) => `Only ${time} remaining nightfarer`,
 };
+
+const DEFAULT_CUE_INTERVALS = [
+  { type: "phase", cue: "noontideStart" },
+  { type: "phase", cue: "nightStart" },
+  { type: "seconds", value: 180, cue: "3min" },
+  { type: "seconds", value: 120, cue: "2min" },
+  { type: "seconds", value: 60, cue: "1min" },
+];
+
+// --- SETTINGS MIGRATION ---
+function migrateAudioSettings(settings) {
+  // If mode is missing, migrate to new structure
+  if (!settings.mode) {
+    return {
+      ...DEFAULT_AUDIO_SETTINGS,
+      ...settings,
+      mode: "custom",
+      voice: "Ranni",
+      useAudioFiles: {
+        noontideStart: !!settings.useAudioFiles?.noontideStart,
+        nightStart: !!settings.useAudioFiles?.nightStart,
+        timeRemaining: !!settings.useAudioFiles?.timeRemaining,
+      },
+    };
+  }
+  return settings;
+}
 
 function getStoredAudioSettings() {
   try {
     const stored = localStorage.getItem("audioCueSettings");
-    return stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
+    const parsed = stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
+    return migrateAudioSettings(parsed);
   } catch {
     return DEFAULT_AUDIO_SETTINGS;
   }
@@ -63,29 +93,38 @@ function setStoredAudioSettings(settings) {
   localStorage.setItem("audioCueSettings", JSON.stringify(settings));
 }
 
+// --- AUDIO CUE MANAGER ---
 function useAudioCueManager(settings) {
   const playedCuesRef = useRef({}); // { phaseKey: { cueType: true } }
 
   // Helper to play TTS or audio file
-  function playCue(type, timeText = "") {
+  function playCue(type, timeText = "", options = {}) {
     if (!settings.enabled) return;
-    let text = "";
-    if (type === "noontideStart") text = AUDIO_CUE_TEXT.noontideStart;
-    else if (type === "nightStart") text = AUDIO_CUE_TEXT.nightStart;
-    else if (type === "timeRemaining") text = AUDIO_CUE_TEXT.timeRemaining(timeText);
+    if (settings.mode === "default") {
+      // Play audio file for default cues
+      let cueFile = null;
+      if (type === "noontideStart" || type === "nightStart") {
+        cueFile = `/audio/${settings.voice}/${type}.mp3`;
+      } else if (type === "3min" || type === "2min" || type === "1min") {
+        cueFile = `/audio/${settings.voice}/${type}.mp3`;
+      }
+      if (cueFile) {
+        const audio = new window.Audio(cueFile);
+        audio.volume = settings.volume;
+        audio.play();
+      }
+    } else {
+      // Custom mode: TTS
+      let text = "";
+      if (type === "noontideStart") text = AUDIO_CUE_TEXT.noontideStart;
+      else if (type === "nightStart") text = AUDIO_CUE_TEXT.nightStart;
+      else if (type === "timeRemaining") text = AUDIO_CUE_TEXT.timeRemaining(timeText);
 
-    // Audio file logic stub
-    if (settings.useAudioFiles[type]) {
-      // TODO: Play audio file for this cue
-      // Example: new Audio(`/audio/${type}.mp3`).play();
-      return;
-    }
-
-    // TTS
-    if (window.speechSynthesis) {
-      const utter = new window.SpeechSynthesisUtterance(text);
-      utter.volume = settings.volume;
-      window.speechSynthesis.speak(utter);
+      if (window.speechSynthesis && text) {
+        const utter = new window.SpeechSynthesisUtterance(text);
+        utter.volume = settings.volume;
+        window.speechSynthesis.speak(utter);
+      }
     }
   }
 
@@ -108,6 +147,7 @@ function useAudioCueManager(settings) {
   return { playCue, resetPhaseCues, markCuePlayed, wasCuePlayed };
 }
 
+// --- TIMER LOGIC ---
 function useNightreignTimer() {
   // nightIndex: null (pre-start), 0 (first night), 1 (second night)
   const [nightIndex, setNightIndex] = useState(null);
@@ -117,14 +157,16 @@ function useNightreignTimer() {
   const [totalNightTime, setTotalNightTime] = useState(TOTAL_NIGHT_TIME);
   const [isPaused, setIsPaused] = useState(true);
 
+  // Audio settings/state
+  const [audioSettings] = useState(getStoredAudioSettings());
+  const audioCueManager = useAudioCueManager(audioSettings);
+
   // Set phaseTime when phaseIndex or nightIndex changes
   useEffect(() => {
     if (nightIndex !== null) {
       setPhaseTime(NIGHT_CIRCLE_PHASES[phaseIndex].seconds);
     }
   }, [nightIndex, phaseIndex]);
-
-  const audioCueManager = useAudioCueManager(getStoredAudioSettings());
 
   // Main timer logic
   useEffect(() => {
@@ -145,30 +187,63 @@ function useNightreignTimer() {
             }
           }
 
-          // Check for audio cues
           const phaseKey = `${nightIndex}-${phaseIndex}`;
           const remainingPercent = (prev / NIGHT_CIRCLE_PHASES[phaseIndex].seconds) * 100;
           const timeForSpeech = formatTimeForSpeech(prev);
 
-          // Play noontideStart or nightStart cue at the beginning of the phase
-          if (prev === NIGHT_CIRCLE_PHASES[phaseIndex].seconds) {
-            const cueType = NIGHT_CIRCLE_PHASES[phaseIndex].circle === "Noontide" ? "noontideStart" : "nightStart";
-            if (!audioCueManager.wasCuePlayed(phaseKey, cueType)) {
-              audioCueManager.playCue(cueType);
-              audioCueManager.markCuePlayed(phaseKey, cueType);
+          // --- AUDIO CUE LOGIC ---
+          const settings = getStoredAudioSettings();
+
+          if (settings.enabled) {
+            if (settings.mode === "default") {
+              // Default mode: play mp3 at hardcoded intervals
+              // Phase start cues
+              if (prev === NIGHT_CIRCLE_PHASES[phaseIndex].seconds) {
+                const cueType = NIGHT_CIRCLE_PHASES[phaseIndex].circle === "Noontide" ? "noontideStart" : "nightStart";
+                if (!audioCueManager.wasCuePlayed(phaseKey, cueType)) {
+                  audioCueManager.playCue(cueType);
+                  audioCueManager.markCuePlayed(phaseKey, cueType);
+                }
+              }
+              // 2/1 min remaining cues
+              [
+                { value: 120, cue: "2min" },
+                { value: 60, cue: "1min" },
+              ].forEach(({ value, cue }) => {
+                if (
+                  prev === value &&
+                  !audioCueManager.wasCuePlayed(phaseKey, cue)
+                ) {
+                  audioCueManager.playCue(cue);
+                  audioCueManager.markCuePlayed(phaseKey, cue);
+                }
+              });
+            } else {
+              // Custom mode: user-configured cues, TTS
+              // Phase start cues (if enabled)
+              if (prev === NIGHT_CIRCLE_PHASES[phaseIndex].seconds) {
+                const cueType = NIGHT_CIRCLE_PHASES[phaseIndex].circle === "Noontide" ? "noontideStart" : "nightStart";
+                if (
+                  settings.useAudioFiles[cueType] &&
+                  !audioCueManager.wasCuePlayed(phaseKey, cueType)
+                ) {
+                  audioCueManager.playCue(cueType);
+                  audioCueManager.markCuePlayed(phaseKey, cueType);
+                }
+              }
+              // User-configured time cues
+              settings.timeCues.forEach((cue) => {
+                const cueKey = `${cue.type}-${cue.value}`;
+                if (
+                  (cue.type === "percent" && remainingPercent <= cue.value && !audioCueManager.wasCuePlayed(phaseKey, cueKey)) ||
+                  (cue.type === "seconds" && prev <= cue.value && !audioCueManager.wasCuePlayed(phaseKey, cueKey))
+                ) {
+                  audioCueManager.playCue("timeRemaining", timeForSpeech);
+                  audioCueManager.markCuePlayed(phaseKey, cueKey);
+                }
+              });
             }
           }
-
-          getStoredAudioSettings().timeCues.forEach((cue) => {
-            const cueKey = `${cue.type}-${cue.value}`;
-            if (
-              (cue.type === "percent" && remainingPercent <= cue.value && !audioCueManager.wasCuePlayed(phaseKey, cueKey)) ||
-              (cue.type === "seconds" && prev <= cue.value && !audioCueManager.wasCuePlayed(phaseKey, cueKey))
-            ) {
-              audioCueManager.playCue("timeRemaining", timeForSpeech);
-              audioCueManager.markCuePlayed(phaseKey, cueKey);
-            }
-          });
 
           return prev - 1;
         });
