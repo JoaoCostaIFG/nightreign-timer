@@ -690,6 +690,9 @@ export default function NightreignTimerApp() {
       </div>
       {/* Footer */}
       <footer className="w-full flex justify-center items-center gap-6 mt-8 p-4 bg-[#0f0d29]">
+        <span className="text-white">
+          Forked from <a href="https://nightreigntimer.com/" target="_blank" rel="noopener noreferrer" className="underline">nightreigntimer.com</a>
+        </span>
         <a
           href="https://github.com/JoaoCostaIFG/nightreign-timer"
           target="_blank"

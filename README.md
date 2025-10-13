@@ -1,12 +1,15 @@
-# React + Vite
+# Nightreign Timer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple web application designed to help players of the Elden Ring mod "Nightreign" keep track of the in-game day and night cycle.
 
-Currently, two official plugins are available:
+This project was forked from the original [nightreigntimer.com](https://nightreigntimer.com/).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+*   **Day/Night Cycle Timer:** A clear and easy-to-use timer that follows the specific phases of the Nightreign mod's day and night cycle.
+*   **Boss Information:** Includes a quick reference for boss resistances and weaknesses to help you prepare for encounters.
+*   **Audio Cues:** Provides optional audio alerts for phase changes to keep you focused on the game.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Usage
+
+Simply open the webpage in your browser to start using the timer. You can select the boss you are tracking to see its specific resistances.
