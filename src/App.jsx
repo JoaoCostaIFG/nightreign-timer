@@ -325,75 +325,143 @@ function useNightreignTimer() {
 const BOSS_LIST = [
   {
     expedition_id: "Tricephalos", weakness: "holy", name: "Gladius, Beast of Night", img: "/gladius-big.png", icon: "/gladius-small.png",
-    negations: {
-      standard: 0, slash: 0, strike: 0, pierce: -10, magic: 0, fire: 50, lightning: 0, holy: -35,
-    },
-    resistances: {
-      poison: 542, scarletRot: 252, bloodLoss: 252, frostbite: 542, sleep: 154, madness: -1,
-    },
+    res: [
+      {
+        "all": {
+          negations: {
+            standard: 0, slash: 0, strike: 0, pierce: -10, magic: 0, fire: 50, lightning: 0, holy: -35,
+          },
+          resistances: {
+            poison: 542, scarletRot: 252, bloodLoss: 252, frostbite: 542, sleep: 154, madness: -1,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Gaping Jaw", weakness: "poison", name: "Adel, Baron of Night", img: "/adel-big.png", icon: "/adel-small.png",
-    negations: {
-      standard: 0, slash: 0, strike: 0, pierce: 0, magic: 0, fire: 20, lightning: 50, holy: 0,
-    },
-    resistances: {
-      poison: 154, scarletRot: 154, bloodLoss: 542, frostbite: 154, sleep: 154, madness: -1,
-    },
+    res: [
+      {
+        "all": {
+          negations: {
+            standard: 0, slash: 0, strike: 0, pierce: 0, magic: 0, fire: 20, lightning: 50, holy: 0,
+          },
+          resistances: {
+            poison: 154, scarletRot: 154, bloodLoss: 542, frostbite: 154, sleep: 154, madness: -1,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Fissure in the Fog", weakness: "fire", name: "Caligo, Miasma of Night", img: "/caligo-big.png", icon: "/caligo-small.png",
-    negations: {
-      standard: 0, slash: 15, strike: -15, pierce: 10, magic: 20, fire: -35, lightning: 20, holy: 20,
-    },
-    resistances: {
-      poison: 252, scarletRot: 252, bloodLoss: 252, frostbite: 542, sleep: 542, madness: -1,
-    },
+    res: [
+      {
+        "all": {
+          negations: {
+            standard: 0, slash: 15, strike: -15, pierce: 10, magic: 20, fire: -35, lightning: 20, holy: 20,
+          },
+          resistances: {
+            poison: 252, scarletRot: 252, bloodLoss: 252, frostbite: 542, sleep: 542, madness: -1,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Augur", weakness: "lightning", name: "Maris, Fathom of Night", img: "/maris-big.png", icon: "/maris-small.png",
-    negations: {
-      standard: 0, slash: -15, strike: 20, pierce: 10, magic: 20, fire: 50, lightning: -40, holy: 15,
-    },
-    resistances: {
-      poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: 252, sleep: -1, madness: -1,
-    },
+    res: [
+      {
+        "all": {
+          negations: {
+            standard: 0, slash: -15, strike: 20, pierce: 10, magic: 20, fire: 50, lightning: -40, holy: 15,
+          },
+          resistances: {
+            poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: 252, sleep: -1, madness: -1,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Sentient Pest", weakness: "fire", name: "Gnoster, Wisdom of Night", img: "/gnoster-big.png", icon: "/gnoster-small.png",
-    negations: {
-      standard: -15, slash: -25, strike: -15, pierce: -25, magic: 50, fire: -40, lightning: 10, holy: 10,
-    },
-    resistances: {
-      poison: 542, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 542, madness: -1,
-    },
+    res: [
+      {
+        "Gnoster (Moth)": {
+          negations: {
+            standard: -15, slash: -25, strike: -15, pierce: -25, magic: 50, fire: -40, lightning: 10, holy: 10,
+          },
+          resistances: {
+            poison: 542, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 542, madness: -1,
+          },
+        }
+      },
+      {
+        "Faurtis (Scorpion)": {
+          negations: {
+            standard: 10, slash: 20, strike: -20, pierce: -10, magic: 10, fire: -35, lightning: 10, holy: 10,
+          },
+          resistances: {
+            poison: 252, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 154, madness: -1,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Equilibrious Beast", weakness: "frenzy", name: "Libra, Creature of Night", img: "/libra-big.png", icon: "/libra-small.png",
-    negations: {
-      standard: 0, slash: -10, strike: 0, pierce: 0, magic: 20, fire: -20, lightning: 0, holy: -35,
-    },
-    resistances: {
-      poison: 154, scarletRot: 154, bloodLoss: 252, frostbite: 252, sleep: -1, madness: 154,
-    },
+    res: [
+      {
+        "all": {
+          negations: {
+            standard: 0, slash: -10, strike: 0, pierce: 0, magic: 20, fire: -20, lightning: 0, holy: -35,
+          },
+          resistances: {
+            poison: 154, scarletRot: 154, bloodLoss: 252, frostbite: 252, sleep: -1, madness: 154,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Darkdrift Knight", weakness: "lightning", name: "Fulghor, Champion of Nightglow", img: "/fulghor-big.png", icon: "/fulghor-small.png",
-    negations: {
-      standard: 0, slash: 0, strike: 0, pierce: 0, magic: 0, fire: 0, lightning: -20, holy: 30,
-    },
-    resistances: {
-      poison: 154, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 154, madness: -1,
-    },
+    res: [
+      {
+        "all": {
+          negations: {
+            standard: 0, slash: 0, strike: 0, pierce: 0, magic: 0, fire: 0, lightning: -20, holy: 30,
+          },
+          resistances: {
+            poison: 154, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 154, madness: -1,
+          },
+        }
+      }
+    ],
   },
   {
     expedition_id: "Night Aspect", weakness: "holy", name: "Heolstor the Nightlord", img: "/heolstor-big.png", icon: "/heolstor-small.png",
-    negations: {
-      standard: 0, slash: -15, strike: 10, pierce: -10, magic: 0, fire: -20, lightning: 0, holy: -35,
-    },
-    resistances: {
-      poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: -1, sleep: 542, madness: -1,
-    },
+    res: [
+      {
+        "Phase 1": {
+          negations: {
+            standard: 0, slash: -15, strike: 10, pierce: -10, magic: 0, fire: -20, lightning: 0, holy: -35,
+          },
+          resistances: {
+            poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: -1, sleep: 542, madness: -1,
+          },
+        }
+      },
+      {
+        "Phase 2": {
+          negations: {
+            standard: 0, slash: 10, strike: -10, pierce: -15, magic: 0, fire: 0, lightning: -20, holy: -20,
+          },
+          resistances: {
+            poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: -1, sleep: 542, madness: -1,
+          },
+        }
+      }
+    ],
   },
 ];
 
@@ -484,7 +552,7 @@ export default function NightreignTimerApp() {
     );
   }
 
-  function BossNegation({ boss, negation }) {
+  function BossNegation({ negations, negation }) {
     const negationIcon = assetUrl(`/${negation}.png`);
     return (
       <span>
@@ -493,12 +561,12 @@ export default function NightreignTimerApp() {
           title={negation}
           className="w-8 h-8 object-contain inline-block mr-1"
         />
-        <span>{boss.negations[negation]}%</span>
+        <span>{negations[negation]}%</span>
       </span>
     )
   }
 
-  function BossNegations({ boss }) {
+  function BossNegations({ negations }) {
     return (
       <>
         <div className="grid grid-cols-1">
@@ -506,22 +574,22 @@ export default function NightreignTimerApp() {
           <span className="text-lg font-semibold text-gray-700 text-center">(higher numbers prevent more damage)</span>
         </div>
         <div className="grid grid-cols-4 gap-1">
-          <BossNegation boss={boss} negation="standard" />
-          <BossNegation boss={boss} negation="slash" />
-          <BossNegation boss={boss} negation="strike" />
-          <BossNegation boss={boss} negation="pierce" />
-          <BossNegation boss={boss} negation="magic" />
-          <BossNegation boss={boss} negation="fire" />
-          <BossNegation boss={boss} negation="lightning" />
-          <BossNegation boss={boss} negation="holy" />
+          <BossNegation negations={negations} negation="standard" />
+          <BossNegation negations={negations} negation="slash" />
+          <BossNegation negations={negations} negation="strike" />
+          <BossNegation negations={negations} negation="pierce" />
+          <BossNegation negations={negations} negation="magic" />
+          <BossNegation negations={negations} negation="fire" />
+          <BossNegation negations={negations} negation="lightning" />
+          <BossNegation negations={negations} negation="holy" />
         </div>
       </>
     )
   }
 
-  function BossResistance({ boss, resistance }) {
+  function BossResistance({ resistances, resistance }) {
     const resIcon = assetUrl(`/${resistance}.png`);
-    const resVal = boss.resistances[resistance]
+    const resVal = resistances[resistance]
     const resValText = (resVal != -1) ? resVal : "Immune"
     return (
       <span>
@@ -535,7 +603,7 @@ export default function NightreignTimerApp() {
     )
   }
 
-  function BossResistances({ boss }) {
+  function BossResistances({ resistances }) {
     return (
       <>
         <div className="grid grid-cols-1">
@@ -543,12 +611,12 @@ export default function NightreignTimerApp() {
           <span className="text-lg font-semibold text-gray-700 text-center">(higher numbers are harder to trigger)</span>
         </div>
         <div className="grid grid-cols-3 gap-1">
-          <BossResistance boss={boss} resistance="poison" />
-          <BossResistance boss={boss} resistance="scarletRot" />
-          <BossResistance boss={boss} resistance="bloodLoss" />
-          <BossResistance boss={boss} resistance="frostbite" />
-          <BossResistance boss={boss} resistance="sleep" />
-          <BossResistance boss={boss} resistance="madness" />
+          <BossResistance resistances={resistances} resistance="poison" />
+          <BossResistance resistances={resistances} resistance="scarletRot" />
+          <BossResistance resistances={resistances} resistance="bloodLoss" />
+          <BossResistance resistances={resistances} resistance="frostbite" />
+          <BossResistance resistances={resistances} resistance="sleep" />
+          <BossResistance resistances={resistances} resistance="madness" />
         </div>
       </>
     )
@@ -589,8 +657,19 @@ export default function NightreignTimerApp() {
             <span className="text-lg text-gray-800 capitalize ml-1">{boss.weakness}</span>
           </div>
         )}
-        <BossNegations boss={boss} />
-        <BossResistances boss={boss} />
+        {boss.res.map((resItem, index) => {
+          const partName = Object.keys(resItem)[0];
+          const partData = resItem[partName];
+          const showPartName = partName !== "all";
+
+          return (
+            <div key={index} className="mt-4">
+              {showPartName && <h3 className="text-xl font-semibold text-center mb-2">{partName}</h3>}
+              <BossNegations negations={partData.negations} />
+              <BossResistances resistances={partData.resistances} />
+            </div>
+          );
+        })}
       </div>
     );
   }
