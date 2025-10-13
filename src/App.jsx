@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import SettingsModal from "./SettingsModal";
 import TimelineCircle from "./TimelineCircle";
+import { BOSS_LIST } from "./lib/bosses.js";
 
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
 
@@ -322,148 +323,6 @@ function useNightreignTimer() {
 }
 
 // --- BOSS DATA (for selection) ---
-const BOSS_LIST = [
-  {
-    expedition_id: "Tricephalos", weakness: "holy", name: "Gladius, Beast of Night", img: "/gladius-big.png", icon: "/gladius-small.png",
-    res: [
-      {
-        "all": {
-          negations: {
-            standard: 0, slash: 0, strike: 0, pierce: -10, magic: 0, fire: 50, lightning: 0, holy: -35,
-          },
-          resistances: {
-            poison: 542, scarletRot: 252, bloodLoss: 252, frostbite: 542, sleep: 154, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Gaping Jaw", weakness: "poison", name: "Adel, Baron of Night", img: "/adel-big.png", icon: "/adel-small.png",
-    res: [
-      {
-        "all": {
-          negations: {
-            standard: 0, slash: 0, strike: 0, pierce: 0, magic: 0, fire: 20, lightning: 50, holy: 0,
-          },
-          resistances: {
-            poison: 154, scarletRot: 154, bloodLoss: 542, frostbite: 154, sleep: 154, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Fissure in the Fog", weakness: "fire", name: "Caligo, Miasma of Night", img: "/caligo-big.png", icon: "/caligo-small.png",
-    res: [
-      {
-        "all": {
-          negations: {
-            standard: 0, slash: 15, strike: -15, pierce: 10, magic: 20, fire: -35, lightning: 20, holy: 20,
-          },
-          resistances: {
-            poison: 252, scarletRot: 252, bloodLoss: 252, frostbite: 542, sleep: 542, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Augur", weakness: "lightning", name: "Maris, Fathom of Night", img: "/maris-big.png", icon: "/maris-small.png",
-    res: [
-      {
-        "all": {
-          negations: {
-            standard: 0, slash: -15, strike: 20, pierce: 10, magic: 20, fire: 50, lightning: -40, holy: 15,
-          },
-          resistances: {
-            poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: 252, sleep: -1, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Sentient Pest", weakness: "fire", name: "Gnoster, Wisdom of Night", img: "/gnoster-big.png", icon: "/gnoster-small.png",
-    res: [
-      {
-        "Gnoster (Moth)": {
-          negations: {
-            standard: -15, slash: -25, strike: -15, pierce: -25, magic: 50, fire: -40, lightning: 10, holy: 10,
-          },
-          resistances: {
-            poison: 542, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 542, madness: -1,
-          },
-        }
-      },
-      {
-        "Faurtis (Scorpion)": {
-          negations: {
-            standard: 10, slash: 20, strike: -20, pierce: -10, magic: 10, fire: -35, lightning: 10, holy: 10,
-          },
-          resistances: {
-            poison: 252, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 154, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Equilibrious Beast", weakness: "frenzy", name: "Libra, Creature of Night", img: "/libra-big.png", icon: "/libra-small.png",
-    res: [
-      {
-        "all": {
-          negations: {
-            standard: 0, slash: -10, strike: 0, pierce: 0, magic: 20, fire: -20, lightning: 0, holy: -35,
-          },
-          resistances: {
-            poison: 154, scarletRot: 154, bloodLoss: 252, frostbite: 252, sleep: -1, madness: 154,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Darkdrift Knight", weakness: "lightning", name: "Fulghor, Champion of Nightglow", img: "/fulghor-big.png", icon: "/fulghor-small.png",
-    res: [
-      {
-        "all": {
-          negations: {
-            standard: 0, slash: 0, strike: 0, pierce: 0, magic: 0, fire: 0, lightning: -20, holy: 30,
-          },
-          resistances: {
-            poison: 154, scarletRot: 154, bloodLoss: 154, frostbite: 154, sleep: 154, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-  {
-    expedition_id: "Night Aspect", weakness: "holy", name: "Heolstor the Nightlord", img: "/heolstor-big.png", icon: "/heolstor-small.png",
-    res: [
-      {
-        "Phase 1": {
-          negations: {
-            standard: 0, slash: -15, strike: 10, pierce: -10, magic: 0, fire: -20, lightning: 0, holy: -35,
-          },
-          resistances: {
-            poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: -1, sleep: 542, madness: -1,
-          },
-        }
-      },
-      {
-        "Phase 2": {
-          negations: {
-            standard: 0, slash: 10, strike: -10, pierce: -15, magic: 0, fire: 0, lightning: -20, holy: -20,
-          },
-          resistances: {
-            poison: -1, scarletRot: 252, bloodLoss: -1, frostbite: -1, sleep: 542, madness: -1,
-          },
-        }
-      }
-    ],
-  },
-];
 
 // --- CARD ANIMATION HELPERS (simple CSS classes) ---
 const CARD_ANIMATION_CLASS = "transition-all duration-500 ease-in-out";
@@ -832,22 +691,7 @@ export default function NightreignTimerApp() {
       {/* Footer */}
       <footer className="w-full flex justify-center items-center gap-6 mt-8 p-4 bg-[#0f0d29]">
         <a
-          href="https://discord.gg/3qVv7CGeJF"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Join our Discord"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-8 h-8 hover:scale-110 transition-transform text-white"
-          >
-            <path d="M20.317 4.369a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.462 0 12.505 12.505 0 0 0-.617-1.249.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C2.533 9.042 1.8 13.566 2.092 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.038.077.077 0 0 0 .084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.105 13.184 13.184 0 0 1-1.872-.9.077.077 0 0 1-.008-.128c.126-.094.252-.192.373-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.073.073 0 0 1 .078.009c.121.099.247.197.373.291a.077.077 0 0 1-.006.128 12.509 12.509 0 0 1-1.873.899.076.076 0 0 0-.04.106c.36.699.772 1.364 1.226 1.993a.076.076 0 0 0 .084.028 19.876 19.876 0 0 0 6.002-3.038.076.076 0 0 0 .031-.056c.334-5.068-.559-9.544-2.349-13.661a.062.062 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.213 0 2.176 1.096 2.157 2.419 0 1.334-.955 2.419-2.157 2.419zm7.96 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.213 0 2.176 1.096 2.157 2.419 0 1.334-.944 2.419-2.157 2.419z" />
-          </svg>
-        </a>
-        <a
-          href="https://github.com/bnelz/nightreign-timer"
+          href="https://github.com/JoaoCostaIFG/nightreign-timer"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="View on GitHub"
