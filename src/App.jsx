@@ -331,7 +331,7 @@ const CARD_ANIMATION_CLASS = "transition-all duration-500 ease-in-out";
 export default function NightreignTimerApp() {
   // --- Multi-step state ---
   // "landing" | "new-expedition" | "timer"
-  const [mode, setMode] = useState("landing");
+  const [mode, setMode] = useState("new-expedition");
   const [selectedBoss, setSelectedBoss] = useState(null);
 
   // --- AUDIO CUE STATE ---
@@ -346,28 +346,7 @@ export default function NightreignTimerApp() {
   // (move all timer logic here, or extract to a TimerCard component if desired)
   // For brevity, I'll keep it inline for now.
 
-  // --- UI: Landing Page ---
-  function LandingCard() {
-    return (
-      <div className={`flex flex-col items-center justify-center w-full h-[70vh] ${CARD_ANIMATION_CLASS}`}>
-        <button
-          className="flex items-center gap-4 px-14 py-8 rounded-2xl bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 text-black text-3xl font-extrabold shadow-2xl border-4 border-yellow-900 hover:scale-105 hover:from-yellow-200 hover:to-yellow-600 transition-all duration-200 tracking-wide"
-          onClick={() => setMode("new-expedition")}
-          aria-label="New Expedition"
-          style={{
-            fontFamily: "'Cinzel', serif",
-            letterSpacing: "0.05em",
-            boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
-          }}
-        >
-          <span className="inline-block bg-black text-yellow-300 rounded-full w-10 h-10 flex items-center justify-center mr-3 text-3xl font-extrabold border-2 border-yellow-700 shadow">
-            +
-          </span>
-          New Expedition
-        </button>
-      </div>
-    );
-  }
+
 
   // --- UI: Boss Selection Card ---
   function NewExpeditionCard() {
@@ -669,7 +648,7 @@ export default function NightreignTimerApp() {
         alt="Nightreign Timer"
         className="w-[250px] md:w-[300px] max-w-full drop-shadow-lg cursor-pointer"
         draggable={false}
-        onClick={() => setMode("landing")}
+        onClick={() => setMode("new-expedition")}
       />
     </div>
   );
@@ -679,7 +658,7 @@ export default function NightreignTimerApp() {
       {header}
       {/* Card transitions */}
       <div className="w-full flex flex-col items-center justify-center flex-1">
-        {mode === "landing" && <LandingCard />}
+
         {mode === "new-expedition" && <NewExpeditionCard />}
         {mode === "timer" && (
           <TimerCard
