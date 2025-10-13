@@ -352,12 +352,12 @@ export default function NightreignTimerApp() {
   function NewExpeditionCard() {
     return (
       <div className={`w-full max-w-7xl mx-auto bg-white shadow-2xl rounded-2xl border border-gray-200 p-16 flex flex-col items-center ${CARD_ANIMATION_CLASS}`}>
-        <h2 className="text-4xl font-bold mb-12 text-black">New Expedition</h2>
+        <h2 className="text-4xl font-bold mb-12 text-black">Nightreign Timer</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14 mb-12 w-full">
           {BOSS_LIST.map((boss) => (
             <button
               key={boss.expedition_id}
-              className="flex flex-col items-center bg-gray-100 rounded-2xl border-2 border-transparent hover:border-black transition focus:outline-none p-6"
+              className="flex flex-col items-center bg-gray-100 rounded-2xl border-1 border-transparent hover:border-black transition focus:outline-none p-4"
               onClick={() => {
                 setSelectedBoss(boss);
                 setMode("timer");
@@ -546,6 +546,16 @@ export default function NightreignTimerApp() {
     return (
       <div className={`w-full max-w-4xl flex flex-col md:flex-row items-center md:items-start justify-center ${CARD_ANIMATION_CLASS}`}>
         <div className="w-full bg-white shadow-lg rounded-lg border border-gray-200 p-8 relative flex flex-col md:flex-row items-center md:items-start">
+          {/* Back Button */}
+          <button
+            className="absolute top-4 left-4 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black rounded-full p-2 transition"
+            aria-label="Back to boss selection"
+            onClick={handleNewExpedition}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
           {/* Boss Card (left/top on mobile) */}
           <BossCard boss={selectedBoss} />
           {/* Timer UI (right/bottom on mobile) */}
@@ -641,24 +651,11 @@ export default function NightreignTimerApp() {
   }
 
   // --- Main Render ---
-  const header = (
-    <div className="w-full flex justify-center mb-6">
-      <img
-        src={assetUrl("/nightreign-timer-banner.png")}
-        alt="Nightreign Timer"
-        className="w-[250px] md:w-[300px] max-w-full drop-shadow-lg cursor-pointer"
-        draggable={false}
-        onClick={() => setMode("new-expedition")}
-      />
-    </div>
-  );
 
   return (
     <div className="min-h-screen w-screen bg-[#151136] flex flex-col items-center p-4 overflow-x-hidden">
-      {header}
       {/* Card transitions */}
       <div className="w-full flex flex-col items-center justify-center flex-1">
-
         {mode === "new-expedition" && <NewExpeditionCard />}
         {mode === "timer" && (
           <TimerCard
@@ -666,6 +663,7 @@ export default function NightreignTimerApp() {
             setSettingsOpen={setSettingsOpen}
           />
         )}
+
       </div>
       {/* Footer */}
       <footer className="w-full flex justify-center items-center gap-6 mt-8 p-4 bg-[#0f0d29]">
