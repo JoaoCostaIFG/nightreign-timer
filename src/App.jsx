@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import SettingsModal from "./SettingsModal";
 import TimelineCircle from "./TimelineCircle";
 
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
+
 // --- NIGHT CIRCLE PHASES CONFIG ---
 // Each night has these four phases in order.
 const NIGHT_CIRCLE_PHASES = [
@@ -104,9 +106,9 @@ function useAudioCueManager(settings) {
       // Play audio file for default cues
       let cueFile = null;
       if (type === "noontideStart" || type === "nightStart") {
-        cueFile = `/audio/${settings.voice}/${type}.mp3`;
+        cueFile = assetUrl(`/audio/${settings.voice}/${type}.mp3`);
       } else if (type === "3min" || type === "2min" || type === "1min") {
-        cueFile = `/audio/${settings.voice}/${type}.mp3`;
+        cueFile = assetUrl(`/audio/${settings.voice}/${type}.mp3`);
       }
       if (cueFile) {
         const audio = new window.Audio(cueFile);
@@ -459,7 +461,7 @@ export default function NightreignTimerApp() {
             >
               <div className="flex items-center justify-center w-full" style={{ minHeight: "16rem", maxHeight: "22rem" }}>
                 <img
-                  src={boss.img}
+                  src={assetUrl(boss.img)}
                   alt={boss.name}
                   className="max-w-full max-h-[22rem] object-contain rounded-2xl shadow-2xl bg-black transition-transform duration-200 hover:scale-105"
                   style={{ display: "block" }}
@@ -483,7 +485,7 @@ export default function NightreignTimerApp() {
   }
 
   function BossNegation({ boss, negation }) {
-    const negationIcon = `/${negation}.png`
+    const negationIcon = assetUrl(`/${negation}.png`);
     return (
       <span>
         <img
@@ -518,7 +520,7 @@ export default function NightreignTimerApp() {
   }
 
   function BossResistance({ boss, resistance }) {
-    const resIcon = `/${resistance}.png`
+    const resIcon = assetUrl(`/${resistance}.png`);
     const resVal = boss.resistances[resistance]
     const resValText = (resVal != -1) ? resVal : "Immune"
     return (
@@ -564,12 +566,12 @@ export default function NightreignTimerApp() {
     }
     // Weakness icon path: `/[weakness]-icon.png`
     const weaknessIcon = boss.weakness
-      ? `/` + boss.weakness.toLowerCase().replace(/\s+/g, "-") + ".png"
+      ? assetUrl(`/` + boss.weakness.toLowerCase().replace(/\s+/g, "-") + ".png")
       : null;
     return (
       <div className="flex flex-col items-center justify-center mb-4 md:mb-0 md:mr-10 w-full md:w-auto">
         <img
-          src={boss.icon}
+          src={assetUrl(boss.icon)}
           alt={boss.name}
           className="w-[12rem] h-[12rem] md:w-[20rem] md:h-[20rem] object-contain rounded-2xl shadow-2xl bg-black mb-4"
           style={{ display: "block" }}
@@ -725,7 +727,7 @@ export default function NightreignTimerApp() {
   const header = (
     <div className="w-full flex justify-center mb-6">
       <img
-        src="/nightreign-timer-banner.png"
+        src={assetUrl("/nightreign-timer-banner.png")}
         alt="Nightreign Timer"
         className="w-[250px] md:w-[300px] max-w-full drop-shadow-lg cursor-pointer"
         draggable={false}

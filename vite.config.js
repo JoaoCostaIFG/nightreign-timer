@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/nightreign-timer/',
   resolve: {
     alias: {
       '@': path.resolve(new URL('.', import.meta.url).pathname, 'src'),
