@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import SettingsModal from "../SettingsModal";
 import TimelineCircle from "../TimelineCircle";
 import BossCard from "./BossCard";
@@ -88,7 +88,7 @@ function useAudioCueManager(settings) {
   const playedCuesRef = useRef({}); // { phaseKey: { cueType: true } }
 
   // Helper to play TTS or audio file
-  function playCue(type, timeText = "", options = {}) {
+  function playCue(type, timeText = "") {
     if (!settings.enabled) return;
     if (settings.mode === "default") {
       // Play audio file for default cues
@@ -324,6 +324,48 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
     displayPhaseTime,
   } = useNightreignTimer();
 
+  const [wakeLock, setWakeLock] = useState(null);
+  const [isWakeLockSupported, setIsWakeLockSupported] = useState(false);
+
+  useEffect(() => {
+    setIsWakeLockSupported('wakeLock' in navigator);
+  }, []);
+
+  const requestWakeLock = useCallback(async () => {
+    if (isWakeLockSupported) {
+      try {
+        const lock = await navigator.wakeLock.request('screen');
+        setWakeLock(lock);
+        lock.addEventListener('release', () => {
+          setWakeLock(null);
+        });
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    }
+  }, [isWakeLockSupported]);
+
+  const releaseWakeLock = useCallback(async () => {
+    if (wakeLock) {
+      await wakeLock.release();
+      setWakeLock(null);
+    }
+  }, [wakeLock]);
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') {
+        await requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [wakeLock, requestWakeLock]);
+
   const timerDone =
     nightIndex === 1 &&
     phaseIndex >= NIGHT_CIRCLE_PHASES.length - 1 &&
@@ -333,6 +375,17 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
     setMode("new-expedition");
     setSelectedBoss(null);
     reset();
+    releaseWakeLock();
+  }
+
+  function handleBegin() {
+    begin();
+    requestWakeLock();
+  }
+
+  function handleReset() {
+    reset();
+    releaseWakeLock();
   }
 
   return (
@@ -397,7 +450,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
             {!timerDone ? (
               <>
                 <button
-                  onClick={begin}
+                  onClick={handleBegin}
                   className="px-6 py-2 rounded bg-black text-white font-semibold shadow hover:bg-gray-800 transition"
                 >
                   {nightIndex === null
@@ -407,7 +460,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
                       : "Running"}
                 </button>
                 <button
-                  onClick={reset}
+                  onClick={handleReset}
                   className="px-6 py-2 rounded border border-black text-black font-semibold bg-white shadow hover:bg-gray-100 transition"
                 >
                   Reset
@@ -422,6 +475,16 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
               </button>
             )}
           </div>
+          {isWakeLockSupported && (
+            <div className="mt-4">
+              <button
+                onClick={wakeLock ? releaseWakeLock : requestWakeLock}
+                className={`px-4 py-2 rounded text-sm ${wakeLock ? 'bg-green-500 text-white' : 'bg-gray-200 text-black'}`}
+              >
+                {wakeLock ? 'Screen Lock Off' : 'Screen Lock On'}
+              </button>
+            </div>
+          )}
         </div>
         <SettingsModal
           open={settingsOpen}
