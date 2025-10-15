@@ -88,7 +88,7 @@ export default function NightreignTimerApp() {
           Forked from <a href="https://nightreigntimer.com/" target="_blank" rel="noopener noreferrer" className="underline">nightreigntimer.com</a>
         </span>
         <a
-          href="https://github.com/bnelz/nightreign-timer"
+          href="https://github.com/JoaoCostaIFG/nightreign-timer"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="View on GitHub"
