@@ -1,6 +1,7 @@
 export const BOSS_LIST = [
   {
     expedition_id: "Tricephalos", weakness: "holy", name: "Gladius, Beast of Night", img: "/gladius-big.png", icon: "/gladius-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Gladius+Beast+of+Night",
     res: [
       {
         "all": {
@@ -16,6 +17,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Gaping Jaw", weakness: "poison", name: "Adel, Baron of Night", img: "/adel-big.png", icon: "/adel-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Adel+Baron+of+Night",
     res: [
       {
         "all": {
@@ -31,6 +33,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Fissure in the Fog", weakness: "fire", name: "Caligo, Miasma of Night", img: "/caligo-big.png", icon: "/caligo-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Caligo+Miasma+of+Night",
     res: [
       {
         "all": {
@@ -46,6 +49,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Augur", weakness: "lightning", name: "Maris, Fathom of Night", img: "/maris-big.png", icon: "/maris-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Maris+Fathom+of+Night",
     res: [
       {
         "all": {
@@ -61,6 +65,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Sentient Pest", weakness: "fire", name: "Gnoster, Wisdom of Night", img: "/gnoster-big.png", icon: "/gnoster-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Gnoster+Wisdom+of+Night",
     res: [
       {
         "Gnoster (Moth)": {
@@ -86,6 +91,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Equilibrious Beast", weakness: "frenzy", name: "Libra, Creature of Night", img: "/libra-big.png", icon: "/libra-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Libra+Creature+of+Night",
     res: [
       {
         "all": {
@@ -101,6 +107,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Darkdrift Knight", weakness: "lightning", name: "Fulghor, Champion of Nightglow", img: "/fulghor-big.png", icon: "/fulghor-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Fulghor+Champion+of+Nightglow",
     res: [
       {
         "all": {
@@ -116,6 +123,7 @@ export const BOSS_LIST = [
   },
   {
     expedition_id: "Night Aspect", weakness: "holy", name: "Heolstor the Nightlord", img: "/heolstor-big.png", icon: "/heolstor-small.png",
+    wikiUrl: "https://eldenringnightreign.wiki.fextralife.com/Heolstor+the+Nightlord",
     res: [
       {
         "Phase 1": {
