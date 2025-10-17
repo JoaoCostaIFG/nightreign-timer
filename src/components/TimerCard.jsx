@@ -31,57 +31,11 @@ function formatTimeForSpeech(seconds) {
   return `${secs} second${secs !== 1 ? "s" : ""}`;
 }
 
-// --- AUDIO CUE CONFIG ---
-const DEFAULT_AUDIO_SETTINGS = {
-  mode: "default", // "default" or "custom"
-  voice: "Ranni", // Only used in default mode
-  enabled: true,
-  volume: 1,
-  timeCues: [
-    { type: "percent", value: 50 }, // 50% remaining
-    { type: "seconds", value: 60 }, // 1 minute left
-  ],
-  useAudioFiles: {
-    noontideStart: true,
-    nightStart: true,
-    timeRemaining: false,
-  },
-};
-
 const AUDIO_CUE_TEXT = {
   noontideStart: "Noontide is here nightfarer, Free Farm Starts Now",
   nightStart: "Night is here nightfarer, Circle Closing",
   timeRemaining: (time) => `Only ${time} remaining nightfarer`,
 };
-
-// --- SETTINGS MIGRATION ---
-function migrateAudioSettings(settings) {
-  // If mode is missing, migrate to new structure
-  if (!settings.mode) {
-    return {
-      ...DEFAULT_AUDIO_SETTINGS,
-      ...settings,
-      mode: "custom",
-      voice: "Ranni",
-      useAudioFiles: {
-        noontideStart: !!settings.useAudioFiles?.noontideStart,
-        nightStart: !!settings.useAudioFiles?.nightStart,
-        timeRemaining: !!settings.useAudioFiles?.timeRemaining,
-      },
-    };
-  }
-  return settings;
-}
-
-function getStoredAudioSettings() {
-  try {
-    const stored = localStorage.getItem("audioCueSettings");
-    const parsed = stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
-    return migrateAudioSettings(parsed);
-  } catch {
-    return DEFAULT_AUDIO_SETTINGS;
-  }
-}
 
 // --- AUDIO CUE MANAGER ---
 function useAudioCueManager(settings) {
@@ -138,7 +92,7 @@ function useAudioCueManager(settings) {
 }
 
 // --- TIMER LOGIC ---
-function useNightreignTimer() {
+function useNightreignTimer(audioSettings) {
   // nightIndex: null (pre-start), 0 (first night), 1 (second night)
   const [nightIndex, setNightIndex] = useState(null);
   // phaseIndex: 0 to 3 (see NIGHT_CIRCLE_PHASES)
@@ -147,8 +101,7 @@ function useNightreignTimer() {
   const [totalNightTime, setTotalNightTime] = useState(TOTAL_NIGHT_TIME);
   const [isPaused, setIsPaused] = useState(true);
 
-  // Audio settings/state
-  const [audioSettings] = useState(getStoredAudioSettings());
+
   const audioCueManager = useAudioCueManager(audioSettings);
 
   // Set phaseTime when phaseIndex or nightIndex changes
@@ -182,7 +135,7 @@ function useNightreignTimer() {
           const timeForSpeech = formatTimeForSpeech(prev);
 
           // --- AUDIO CUE LOGIC ---
-          const settings = getStoredAudioSettings();
+          const settings = audioSettings;
 
           if (settings.enabled) {
             if (settings.mode === "default") {
@@ -322,7 +275,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
     currentCircleLabel,
     currentPhaseLabel,
     displayPhaseTime,
-  } = useNightreignTimer();
+  } = useNightreignTimer(audioSettings);
 
   const [wakeLock, setWakeLock] = useState(null);
   const [isWakeLockSupported, setIsWakeLockSupported] = useState(false);
