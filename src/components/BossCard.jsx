@@ -93,14 +93,14 @@ export default function BossCard({ boss }) {
         className="w-[12rem] h-[12rem] md:w-[20rem] md:h-[20rem] object-contain rounded-2xl shadow-2xl bg-black mb-4"
         style={{ display: "block" }}
       />
-      <div className="flex items-center justify-center mb-2">
+      <div className="flex flex-col md:flex-row items-center justify-center mb-2">
         <span className="text-2xl font-bold text-black">{boss.name}</span>
         {boss.wikiUrl && (
           <a
             href={boss.wikiUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center bg-blue-600 text-white rounded px-4 py-2 ml-2 hover:bg-blue-700 transition"
+            className="inline-flex items-center bg-blue-600 text-white rounded px-3 py-1 mt-2 md:mt-0 md:ml-2 hover:bg-blue-700 transition text-sm"
           >
             Wiki
             <ExternalLink className="w-4 h-4 ml-1" />
