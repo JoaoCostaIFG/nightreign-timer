@@ -1,5 +1,3 @@
-import React from "react";
-
 // Props: phases (array), phaseIndex (number), phaseTime (number), phaseTotal (number)
 export default function TimelineCircle({ phases, phaseIndex, phaseTime, phaseTotal }) {
   // Calculate hand angle: 0° at phase 0, 90° at phase 1, etc.

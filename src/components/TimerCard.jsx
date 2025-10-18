@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import SettingsModal from "../SettingsModal";
 import TimelineCircle from "../TimelineCircle";
 import BossCard from "./BossCard";
 import { assetUrl } from "../lib/utils";
+import { CARD_ANIMATION_CLASS } from "../lib/constants";
 
 // --- NIGHT CIRCLE PHASES CONFIG ---
 // Each night has these four phases in order.
@@ -42,7 +43,7 @@ function useAudioCueManager(settings) {
   const playedCuesRef = useRef({}); // { phaseKey: { cueType: true } }
 
   // Helper to play TTS or audio file
-  function playCue(type, timeText = "") {
+  const playCue = useCallback((type, timeText = "") => {
     if (!settings.enabled) return;
     if (settings.mode === "default") {
       // Play audio file for default cues
@@ -70,29 +71,30 @@ function useAudioCueManager(settings) {
         window.speechSynthesis.speak(utter);
       }
     }
-  }
+  }, [settings]);
 
   // Reset played cues when phase changes
-  function resetPhaseCues(phaseKey) {
+  const resetPhaseCues = useCallback((phaseKey) => {
     playedCuesRef.current[phaseKey] = {};
-  }
+  }, []);
 
   // Mark cue as played for this phase
-  function markCuePlayed(phaseKey, cueType) {
+  const markCuePlayed = useCallback((phaseKey, cueType) => {
     if (!playedCuesRef.current[phaseKey]) playedCuesRef.current[phaseKey] = {};
     playedCuesRef.current[phaseKey][cueType] = true;
-  }
+  }, []);
 
   // Check if cue was played for this phase
-  function wasCuePlayed(phaseKey, cueType) {
+  const wasCuePlayed = useCallback((phaseKey, cueType) => {
     return playedCuesRef.current[phaseKey]?.[cueType];
-  }
+  }, []);
 
-  return { playCue, resetPhaseCues, markCuePlayed, wasCuePlayed };
+  return useMemo(() => ({ playCue, resetPhaseCues, markCuePlayed, wasCuePlayed }),
+    [playCue, resetPhaseCues, markCuePlayed, wasCuePlayed]);
 }
 
 // --- TIMER LOGIC ---
-function useNightreignTimer(audioSettings) {
+function useNightreignTimer(audioSettings, audioCueManager) {
   // nightIndex: null (pre-start), 0 (first night), 1 (second night)
   const [nightIndex, setNightIndex] = useState(null);
   // phaseIndex: 0 to 3 (see NIGHT_CIRCLE_PHASES)
@@ -100,9 +102,6 @@ function useNightreignTimer(audioSettings) {
   const [phaseTime, setPhaseTime] = useState(0);
   const [totalNightTime, setTotalNightTime] = useState(TOTAL_NIGHT_TIME);
   const [isPaused, setIsPaused] = useState(true);
-
-
-  const audioCueManager = useAudioCueManager(audioSettings);
 
   // Set phaseTime when phaseIndex or nightIndex changes
   useEffect(() => {
@@ -194,7 +193,7 @@ function useNightreignTimer(audioSettings) {
       }, 1000);
     }
     return () => timer && clearInterval(timer);
-  }, [nightIndex, isPaused, phaseIndex, audioCueManager]);
+  }, [nightIndex, isPaused, phaseIndex, audioCueManager, audioSettings]);
 
   const begin = () => {
     if (nightIndex === null) {
@@ -229,7 +228,7 @@ function useNightreignTimer(audioSettings) {
   let displayNightTime = TOTAL_NIGHT_TIME;
 
   if (nightIndex === null) {
-    currentNightLabel = "";
+    currentNightLabel = "Ready to Begin";
     currentCircleLabel = NIGHT_CIRCLE_PHASES[0].circle;
     currentPhaseLabel = NIGHT_CIRCLE_PHASES[0].phase;
     displayPhaseTime = NIGHT_CIRCLE_PHASES[0].seconds;
@@ -262,9 +261,8 @@ function useNightreignTimer(audioSettings) {
   };
 }
 
-const CARD_ANIMATION_CLASS = "transition-all duration-500 ease-in-out";
-
 export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss, setMode, setSelectedBoss, audioSettings, setAudioSettings }) {
+  const audioCueManager = useAudioCueManager(audioSettings);
   const {
     nightIndex,
     phaseIndex,
@@ -275,7 +273,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
     currentCircleLabel,
     currentPhaseLabel,
     displayPhaseTime,
-  } = useNightreignTimer(audioSettings);
+  } = useNightreignTimer(audioSettings, audioCueManager);
 
   const [wakeLock, setWakeLock] = useState(null);
   const [isWakeLockSupported, setIsWakeLockSupported] = useState(false);
@@ -366,11 +364,9 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
           </button>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-center md:justify-center gap-0 w-full">
             <div className="flex flex-col items-center justify-center w-full">
-              {currentNightLabel && (
-                <p className="text-xl font-medium text-black mb-2">
-                  {currentNightLabel}
-                </p>
-              )}
+              <p className="text-xl font-medium text-black mb-2">
+                {currentNightLabel}
+              </p>
               <TimelineCircle
                 phases={NIGHT_CIRCLE_PHASES}
                 phaseIndex={phaseIndex}

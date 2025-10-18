@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 
 const DEFAULT_VOICES = ["Ranni", "Miquella", "Malenia"];
 
@@ -6,7 +6,7 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
   const [localSettings, setLocalSettings] = useState(settings);
 
   // Sync local state with parent when opened
-  React.useEffect(() => {
+  useEffect(() => {
     setLocalSettings(settings);
   }, [settings, open]);
 

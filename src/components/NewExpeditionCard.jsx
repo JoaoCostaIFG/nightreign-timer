@@ -1,7 +1,6 @@
 import { BOSS_LIST } from "../lib/bosses.js";
 import { assetUrl } from "../lib/utils.js";
-
-const CARD_ANIMATION_CLASS = "transition-all duration-500 ease-in-out";
+import { CARD_ANIMATION_CLASS } from "../lib/constants.js";
 
 export default function NewExpeditionCard({ setMode, setSelectedBoss }) {
   return (
