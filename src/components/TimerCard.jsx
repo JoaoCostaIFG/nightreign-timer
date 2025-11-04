@@ -277,9 +277,16 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
 
   const [wakeLock, setWakeLock] = useState(null);
   const [isWakeLockSupported, setIsWakeLockSupported] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsWakeLockSupported('wakeLock' in navigator);
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const requestWakeLock = useCallback(async () => {
@@ -424,7 +431,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
               </button>
             )}
           </div>
-          {isWakeLockSupported && (
+          {isWakeLockSupported && isMobile && (
             <div className="mt-4">
               <button
                 onClick={wakeLock ? releaseWakeLock : requestWakeLock}

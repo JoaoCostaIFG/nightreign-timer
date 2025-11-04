@@ -16,6 +16,35 @@ export default function NightreignTimerApp() {
   // --- SETTINGS MODAL STATE ---
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  // --- BROWSER HISTORY INTEGRATION ---
+  useEffect(() => {
+    // Initialize history state
+    const initialState = { mode, selectedBoss };
+    window.history.replaceState(initialState, '');
+
+    // Handle browser back/forward buttons
+    const handlePopState = (event) => {
+      if (event.state) {
+        setMode(event.state.mode);
+        setSelectedBoss(event.state.selectedBoss);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Update history when mode or selectedBoss changes
+  useEffect(() => {
+    const currentState = window.history.state;
+    const newState = { mode, selectedBoss };
+    
+    // Only push new state if it's different from current
+    if (!currentState || currentState.mode !== mode || currentState.selectedBoss !== selectedBoss) {
+      window.history.pushState(newState, '');
+    }
+  }, [mode, selectedBoss]);
+
   return (
     <div className="min-h-screen w-screen bg-[#151136] flex flex-col items-center p-4 overflow-x-hidden">
       {/* Card transitions */}
