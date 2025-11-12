@@ -3,7 +3,7 @@ import { assetUrl } from "../lib/utils.js";
 function BossNegation({ negations, negation }) {
   const negationIcon = assetUrl(`/${negation}.png`);
   return (
-    <span>
+    <span className="text-white">
       <img
         src={negationIcon}
         title={negation}
@@ -18,8 +18,8 @@ function BossNegations({ negations }) {
   return (
     <>
       <div className="grid grid-cols-1">
-        <span className="text-lg font-semibold text-gray-700 text-center">Negations:</span>
-        <span className="text-lg font-semibold text-gray-700 text-center">(higher numbers prevent more damage)</span>
+        <span className="text-lg font-semibold text-white text-center">Negations:</span>
+        <span className="text-lg font-semibold text-gray-300 text-center">(higher numbers prevent more damage)</span>
       </div>
       <div className="grid grid-cols-4 gap-1">
         <BossNegation negations={negations} negation="standard" />
@@ -40,7 +40,7 @@ function BossResistance({ resistances, resistance }) {
   const resVal = resistances[resistance]
   const resValText = (resVal != -1) ? resVal : "Immune"
   return (
-    <span>
+    <span className="text-white">
       <img
         src={resIcon}
         title={resistance}
@@ -55,8 +55,8 @@ function BossResistances({ resistances }) {
   return (
     <>
       <div className="grid grid-cols-1">
-        <span className="text-lg font-semibold text-gray-700 text-center">Resistances:</span>
-        <span className="text-lg font-semibold text-gray-700 text-center">(higher numbers are harder to trigger)</span>
+        <span className="text-lg font-semibold text-white text-center">Resistances:</span>
+        <span className="text-lg font-semibold text-gray-300 text-center">(higher numbers are harder to trigger)</span>
       </div>
       <div className="grid grid-cols-3 gap-1">
         <BossResistance resistances={resistances} resistance="poison" />
@@ -75,9 +75,9 @@ import { ExternalLink } from "lucide-react";
 export default function BossCard({ boss }) {
   if (!boss) {
     return (
-      <div className="flex flex-col items-center justify-center w-48 min-w-[12rem] max-w-[14rem] bg-gray-50 rounded-lg shadow p-4 mr-6 md:mr-6 mb-4 md:mb-0">
-        <span className="text-gray-400 text-2xl mb-2">?</span>
-        <span className="text-gray-500 font-medium">No Boss Tracked</span>
+      <div className="flex flex-col items-center justify-center w-48 min-w-[12rem] max-w-[14rem] bg-gray-800 rounded-lg shadow p-4 mr-6 md:mr-6 mb-4 md:mb-0">
+        <span className="text-gray-500 text-2xl mb-2">?</span>
+        <span className="text-gray-400 font-medium">No Boss Tracked</span>
       </div>
     );
   }
@@ -94,7 +94,7 @@ export default function BossCard({ boss }) {
         style={{ display: "block" }}
       />
       <div className="flex flex-col md:flex-row items-center justify-center mb-2">
-        <span className="text-2xl font-bold text-black">{boss.name}</span>
+        <span className="text-2xl font-bold text-white">{boss.name}</span>
         {boss.wikiUrl && (
           <a
             href={boss.wikiUrl}
@@ -109,14 +109,14 @@ export default function BossCard({ boss }) {
       </div>
       {boss.weakness && (
         <div className="flex items-center mt-2">
-          <span className="text-lg font-semibold text-gray-700 mr-2">Weakness:</span>
+          <span className="text-lg font-semibold text-white mr-2">Weakness:</span>
           <img
             src={weaknessIcon}
             alt={boss.weakness + " icon"}
             className="w-8 h-8 object-contain inline-block"
             style={{ marginRight: "0.25rem" }}
           />
-          <span className="text-lg text-gray-800 capitalize ml-1">{boss.weakness}</span>
+          <span className="text-lg text-white capitalize ml-1">{boss.weakness}</span>
         </div>
       )}
       {boss.res.map((resItem, index) => {
@@ -126,7 +126,7 @@ export default function BossCard({ boss }) {
 
         return (
           <div key={index} className="mt-4">
-            {showPartName && <h3 className="text-xl font-semibold text-center mb-2">{partName}</h3>}
+            {showPartName && <h3 className="text-xl font-semibold text-center mb-2 text-white">{partName}</h3>}
             <BossNegations negations={partData.negations} />
             <BossResistances resistances={partData.resistances} />
           </div>

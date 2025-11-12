@@ -348,9 +348,9 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
 
   return (
     <div className={`w-full max-w-4xl flex flex-col md:flex-row items-center md:items-start justify-center ${CARD_ANIMATION_CLASS}`}>
-      <div className="w-full bg-white shadow-lg rounded-lg border border-gray-200 p-8 relative flex flex-col md:flex-row items-center md:items-start">
+      <div className="w-full bg-[#1a1a1a] shadow-lg rounded-lg border border-gray-700 p-8 relative flex flex-col md:flex-row items-center md:items-start">
         <button
-          className="absolute top-4 left-4 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black rounded-full p-2 transition"
+          className="absolute top-4 left-4 bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white rounded-full p-2 transition"
           aria-label="Back to boss selection"
           onClick={handleNewExpedition}
         >
@@ -361,7 +361,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
         <BossCard boss={selectedBoss} />
         <div className="flex-1 flex flex-col items-center w-full">
           <button
-            className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
+            className="absolute top-4 right-4 text-gray-300 hover:text-white transition"
             aria-label="Settings"
             onClick={() => setSettingsOpen(true)}
           >
@@ -371,7 +371,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
           </button>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-center md:justify-center gap-0 w-full">
             <div className="flex flex-col items-center justify-center w-full">
-              <p className="text-xl font-medium text-black mb-2">
+              <p className="text-xl font-medium text-gray-100 mb-2">
                 {currentNightLabel}
               </p>
               <TimelineCircle
@@ -382,19 +382,19 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
               />
               <div className="flex flex-col items-center gap-3 mt-4">
                 <div className="text-center">
-                  <h2 className="text-l font-semibold text-black mb-1">
+                  <h2 className="text-l font-semibold text-gray-200 mb-1">
                     Total Night Timer
                   </h2>
-                  <p className="text-3xl font-mono text-black">
+                  <p className="text-3xl font-mono text-gray-100">
                     {formatTime(displayNightTime)}
                   </p>
                 </div>
                 {(currentCircleLabel && currentPhaseLabel) && (
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold text-black mb-1">
+                    <h3 className="text-lg font-semibold text-gray-200 mb-1">
                       {currentCircleLabel} – {currentPhaseLabel}
                     </h3>
-                    <p className="text-3xl font-mono text-black">
+                    <p className="text-3xl font-mono text-gray-100">
                       {formatTime(displayPhaseTime)}
                     </p>
                   </div>
@@ -407,7 +407,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
               <>
                 <button
                   onClick={handleBegin}
-                  className="px-6 py-2 rounded bg-black text-white font-semibold shadow hover:bg-gray-800 transition"
+                  className="px-6 py-2 rounded bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition"
                 >
                   {nightIndex === null
                     ? "Begin"
@@ -417,7 +417,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
                 </button>
                 <button
                   onClick={handleReset}
-                  className="px-6 py-2 rounded border border-black text-black font-semibold bg-white shadow hover:bg-gray-100 transition"
+                  className="px-6 py-2 rounded border-2 border-gray-500 text-gray-100 font-semibold bg-gray-700 shadow-lg hover:bg-gray-600 hover:border-gray-400 transition"
                 >
                   Reset
                 </button>
@@ -425,7 +425,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
             ) : (
               <button
                 onClick={handleNewExpedition}
-                className="px-8 py-3 rounded bg-black text-white font-bold text-lg shadow hover:bg-gray-800 transition"
+                className="px-8 py-3 rounded bg-blue-600 text-white font-bold text-lg shadow-lg hover:bg-blue-700 transition"
               >
                 New Expedition
               </button>
@@ -435,7 +435,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
             <div className="mt-4">
               <button
                 onClick={wakeLock ? releaseWakeLock : requestWakeLock}
-                className={`px-4 py-2 rounded text-sm ${wakeLock ? 'bg-green-500 text-white' : 'bg-gray-200 text-black'}`}
+                className={`px-4 py-2 rounded text-sm font-medium ${wakeLock ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-100 border border-gray-500'}`}
               >
                 {wakeLock ? 'Screen Lock Off' : 'Screen Lock On'}
               </button>

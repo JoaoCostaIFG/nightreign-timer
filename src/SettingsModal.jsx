@@ -37,26 +37,26 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      <div className="bg-[#1a1a1a] rounded-lg shadow-lg p-6 w-full max-w-md relative border border-gray-700">
         <button
-          className="absolute top-2 right-2 text-gray-400 hover:text-black"
+          className="absolute top-2 right-2 text-gray-400 hover:text-white text-3xl leading-none"
           onClick={onClose}
           aria-label="Close"
         >
           ×
         </button>
-        <h2 className="text-xl font-semibold mb-4">Settings</h2>
+        <h2 className="text-xl font-semibold mb-4 text-white">Settings</h2>
         <div className="space-y-4">
           {/* --- Audio Cue Mode Selection --- */}
           <div>
-            <label className="block mb-1 font-medium">Audio Cue Mode</label>
+            <label className="block mb-1 font-medium text-gray-200">Audio Cue Mode</label>
             <select
               value={localSettings.mode}
               onChange={e =>
                 setLocalSettings({ ...localSettings, mode: e.target.value })
               }
-              className="border rounded px-2 py-1 w-full"
+              className="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-gray-100"
             >
               <option value="default">Default (Game Voices, Fixed Cues)</option>
               <option value="custom">Custom (TTS, User Cues)</option>
@@ -65,13 +65,13 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
           {/* --- Voice Selection (only in default mode) --- */}
           {localSettings.mode === "default" && (
             <div>
-              <label className="block mb-1 font-medium">Voice</label>
+              <label className="block mb-1 font-medium text-gray-200">Voice</label>
               <select
                 value={localSettings.voice}
                 onChange={e =>
                   setLocalSettings({ ...localSettings, voice: e.target.value })
                 }
-                className="border rounded px-2 py-1 w-full"
+                className="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-gray-100"
               >
                 {DEFAULT_VOICES.map(v => (
                   <option key={v} value={v}>{v}</option>
@@ -80,19 +80,20 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
             </div>
           )}
           <div>
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-gray-200">
               <input
                 type="checkbox"
                 checked={localSettings.enabled}
                 onChange={e =>
                   setLocalSettings({ ...localSettings, enabled: e.target.checked })
                 }
+                className="w-4 h-4"
               />
               Enable Audio Cues
             </label>
           </div>
           <div>
-            <label className="block mb-1 font-medium">Volume</label>
+            <label className="block mb-1 font-medium text-gray-200">Volume</label>
             <input
               type="range"
               min={0}
@@ -104,20 +105,20 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
               }
               className="w-full"
             />
-            <div className="text-xs text-gray-500">{Math.round(localSettings.volume * 100)}%</div>
+            <div className="text-xs text-gray-400">{Math.round(localSettings.volume * 100)}%</div>
           </div>
           {/* --- Custom Mode: Time Cues and Cue Type Toggles --- */}
           {localSettings.mode === "custom" && (
             <>
               <div>
-                <label className="block mb-1 font-medium">Time Remaining Cues</label>
+                <label className="block mb-1 font-medium text-gray-200">Time Remaining Cues</label>
                 <div className="space-y-2">
                   {localSettings.timeCues.map((cue, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                       <select
                         value={cue.type}
                         onChange={e => handleTimeCueChange(idx, "type", e.target.value)}
-                        className="border rounded px-1 py-0.5"
+                        className="border border-gray-600 rounded px-1 py-0.5 bg-gray-800 text-gray-100"
                       >
                         <option value="percent">Percent</option>
                         <option value="seconds">Seconds</option>
@@ -128,10 +129,10 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
                         max={cue.type === "percent" ? 99 : 600}
                         value={cue.value}
                         onChange={e => handleTimeCueChange(idx, "value", parseInt(e.target.value, 10))}
-                        className="border rounded px-1 py-0.5 w-16"
+                        className="border border-gray-600 rounded px-1 py-0.5 w-16 bg-gray-800 text-gray-100"
                       />
                       <button
-                        className="text-red-500 hover:underline"
+                        className="text-red-400 hover:text-red-300 hover:underline"
                         onClick={() => handleRemoveTimeCue(idx)}
                       >
                         Remove
@@ -139,7 +140,7 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
                     </div>
                   ))}
                   <button
-                    className="text-blue-600 hover:underline text-sm"
+                    className="text-blue-400 hover:text-blue-300 hover:underline text-sm"
                     onClick={handleAddTimeCue}
                   >
                     Add Cue
@@ -147,9 +148,9 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
                 </div>
               </div>
               <div>
-                <label className="block mb-1 font-medium">Cue Type</label>
+                <label className="block mb-1 font-medium text-gray-200">Cue Type</label>
                 <div className="space-y-1">
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-gray-200">
                     <input
                       type="checkbox"
                       checked={localSettings.useAudioFiles.noontideStart}
@@ -162,10 +163,11 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
                           },
                         })
                       }
+                      className="w-4 h-4"
                     />
                     Enable Noontide Start Cue
                   </label>
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-gray-200">
                     <input
                       type="checkbox"
                       checked={localSettings.useAudioFiles.nightStart}
@@ -178,11 +180,12 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
                           },
                         })
                       }
+                      className="w-4 h-4"
                     />
                     Enable Night Start Cue
                   </label>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-gray-400 mt-1">
                   (Cues use browser TTS in custom mode)
                 </div>
               </div>
@@ -190,7 +193,7 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
           )}
           {/* --- Default Mode: Info --- */}
           {localSettings.mode === "default" && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-400">
               Cues will play at: Noontide Start, Night Start, 3min, 2min, 1min remaining.<br />
               Uses selected voice audio files.
             </div>
@@ -198,13 +201,13 @@ export default function SettingsModal({ open, onClose, settings, setSettings }) 
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button
-            className="px-4 py-2 rounded bg-gray-200 text-black font-semibold hover:bg-gray-300"
+            className="px-4 py-2 rounded bg-gray-700 text-gray-100 font-semibold hover:bg-gray-600 border border-gray-600"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 rounded bg-black text-white font-semibold hover:bg-gray-800"
+            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700"
             onClick={handleSave}
           >
             Save
