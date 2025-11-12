@@ -46,7 +46,7 @@ export default function NightreignTimerApp() {
   }, [mode, selectedBoss]);
 
   return (
-    <div className="min-h-screen w-screen bg-[#151136] flex flex-col items-center p-4 overflow-x-hidden">
+    <div className="min-h-screen w-screen bg-[#0f0f0f] flex flex-col items-center p-4 overflow-x-hidden">
       {/* Card transitions */}
       <div className="w-full flex flex-col items-center justify-center flex-1">
         {mode === "new-expedition" && <NewExpeditionCard setMode={setMode} setSelectedBoss={setSelectedBoss} />}
@@ -63,7 +63,7 @@ export default function NightreignTimerApp() {
         )}
       </div>
       {/* Footer */}
-      <footer className="w-full flex justify-center items-center gap-6 mt-8 p-4 bg-[#0f0d29]">
+      <footer className="w-full flex justify-center items-center gap-6 mt-8 p-4 bg-[#1a1a1a]">
         <span className="text-white">
           Forked from <a href="https://nightreigntimer.com/" target="_blank" rel="noopener noreferrer" className="underline">nightreigntimer.com</a>
         </span>
