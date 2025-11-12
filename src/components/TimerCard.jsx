@@ -371,7 +371,7 @@ export default function TimerCard({ settingsOpen, setSettingsOpen, selectedBoss,
           </button>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-center md:justify-center gap-0 w-full">
             <div className="flex flex-col items-center justify-center w-full">
-              <p className="text-xl font-medium text-gray-100 mb-2">
+              <p className="text-xl font-bold text-gray-100 mb-2">
                 {currentNightLabel}
               </p>
               <TimelineCircle

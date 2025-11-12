@@ -90,7 +90,7 @@ export default function BossCard({ boss }) {
       <img
         src={assetUrl(boss.icon)}
         alt={boss.name}
-        className="w-[12rem] h-[12rem] md:w-[20rem] md:h-[20rem] object-contain rounded-2xl shadow-2xl bg-black mb-4"
+        className="w-[13.75rem] h-[13.75rem] object-contain mb-4"
         style={{ display: "block" }}
       />
       <div className="flex flex-col md:flex-row items-center justify-center mb-2">

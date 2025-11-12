@@ -39,7 +39,6 @@ export default function TimelineCircle({ phases, phaseIndex, phaseTime, phaseTot
           fill="none"
           stroke="#000000"
           strokeWidth={4}
-          style={{ filter: "drop-shadow(0 0 8px #FFD70088)" }}
         />
         {/* Draw quadrants */}
         {phases.map((p, i) => {
@@ -70,7 +69,6 @@ export default function TimelineCircle({ phases, phaseIndex, phaseTime, phaseTot
           strokeWidth={6}
           strokeLinecap="round"
           transform={`rotate(${handAngle})`}
-          style={{ filter: "drop-shadow(0 0 6px #FFD70088)" }}
         />
         {/* Center circle */}
         <circle cx={0} cy={0} r={16} fill="#151136" stroke="#FFD700" strokeWidth={3} />
@@ -92,7 +90,6 @@ export default function TimelineCircle({ phases, phaseIndex, phaseTime, phaseTot
               style={{
                 fontFamily: "serif",
                 fontWeight: "bold",
-                textShadow: "0 1px 4px #000",
                 letterSpacing: "1px",
                 pointerEvents: "none",
                 whiteSpace: "pre",
